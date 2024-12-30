@@ -13,6 +13,7 @@ fake = Faker()
 def generate_landlord_data():
     landlord_data = {
         'name': 'John Doe',
+        'username': 'landlord',
         'email': 'landlord@example.com',
         'role': 'landlord',
         'password': bcrypt.hashpw(b"password", bcrypt.gensalt()),
@@ -27,9 +28,16 @@ def generate_tenant_data(properties):
     for property in properties:
         for _ in range(property['number_of_tenants']):
             property_id = property['_id']
+            first_name = fake.first_name()
+            last_name = fake.last_name()
+            full_name =  f"{first_name} {last_name}"
+            username = f"{first_name[0].lower()}{last_name.lower()}"
+            email = f"{first_name.lower()}.{last_name.lower()}@example.com"
+
             tenant = {
-                'name': fake.name(),
-                'email': fake.email(),
+                'name': full_name,
+                'username': username,
+                'email': email,
                 'role': 'tenant',
                 'password': bcrypt.hashpw(b"password", bcrypt.gensalt()),
                 'property_id': property_id
