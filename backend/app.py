@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from blueprints.auth import auth_bp
+from backend.blueprints.auth.auth import auth_bp
 
 app = Flask(__name__)
 CORS(app)
