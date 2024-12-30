@@ -1,5 +1,6 @@
 import datetime, jwt, bcrypt, globals
 from flask import Blueprint, make_response, jsonify, request
+from decorators import jwt_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -28,6 +29,7 @@ def login():
     return make_response(jsonify({'error': 'AUTHENTICATION REQUIRED'}), 401)
 
 @auth_bp.route('/api/logout', methods=['GET'])
+@jwt_required
 def logout():
     token = request.headers['x-access-token']
     blacklist.insert_one({'token': token})
