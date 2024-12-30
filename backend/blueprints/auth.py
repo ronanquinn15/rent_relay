@@ -31,3 +31,9 @@ def login():
         else:
             return make_response(jsonify({'error': 'User not found'}), 404)
     return make_response(jsonify({'error': 'AUTHENTICATION REQUIRED'}), 401)
+
+@auth_bp.route('/api/logout', methods=['GET'])
+def logout():
+    token = request.headers['x-access-token']
+    blacklist.insert_one({'token': token})
+    return make_response(jsonify({'message': 'Logged out successfully'}), 200)
