@@ -1,17 +1,12 @@
-import datetime, jwt, bcrypt
+import datetime, jwt, bcrypt, globals
 from flask import Blueprint, make_response, jsonify, request
-from pymongo import MongoClient
 
 auth_bp = Blueprint('auth', __name__)
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client.rentRelayDB
-
-blacklist = db.blacklist
-tenants = db.tenants
-landlords = db.landlords
-admin = db.admin
-secret_key = 'secret_key'
+blacklist = globals.db.blacklist
+tenants = globals.db.tenants
+landlords = globals.db.landlords
+admin = globals.db.admin
 
 @auth_bp.route('/api/login', methods=['GET'])
 def login():
@@ -24,7 +19,7 @@ def login():
                     'user': user['email'],
                     'role': user['role'],
                     'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=90)
-                },secret_key ,algorithm='HS256')
+                }, globals.secret_key ,algorithm='HS256')
                 return make_response(jsonify({'token': token}), 200)
             else:
                 return make_response(jsonify({'error': 'Password is incorrect'}), 401)
