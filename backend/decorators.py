@@ -28,8 +28,30 @@ def admin_required(f):
     def admin_required_wrapper(*args, **kwargs):
         token = request.headers['x-access-token']
         data = jwt.decode(token, globals.secret_key, algorithms='HS256')
-        if data['admin']:
+        if data['role'] == 'admin':
             return f(*args, **kwargs)
         else:
             return make_response(jsonify({'error': 'Admin access required'}), 401)
     return admin_required_wrapper
+
+def landlord_required(f):
+    @wraps(f)
+    def landlord_required_wrapper(*args, **kwargs):
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        if data['role'] == 'landlord':
+            return f(*args, **kwargs)
+        else:
+            return make_response(jsonify({'error': 'Landlord access required'}), 401)
+    return landlord_required_wrapper
+
+def tenant_required(f):
+    @wraps(f)
+    def tenant_required_wrapper(*args, **kwargs):
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        if data['role'] == 'tenant':
+            return f(*args, **kwargs)
+        else:
+            return make_response(jsonify({'error': 'Tenant access required'}), 401)
+    return tenant_required_wrapper
