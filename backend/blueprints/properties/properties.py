@@ -23,6 +23,7 @@ def auto_populate_landlord_id():
     return None
 
 @properties_bp.route('/api/properties', methods=['GET'])
+@landlord_required
 def get_all_properties():
     properties_list = []
 
@@ -34,6 +35,7 @@ def get_all_properties():
     return make_response(jsonify(properties_list), 200)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['GET'])
+@landlord_required
 def get_property(property_id):
     property = properties.find_one({'_id': ObjectId(property_id)})
     if property is not None:
@@ -44,6 +46,7 @@ def get_property(property_id):
     return make_response(jsonify({'error': 'Property not found'}), 404)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['PUT'])
+@landlord_required
 def update_property(property_id):
     fields = ['number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date']
     updated_information = {}
@@ -97,6 +100,7 @@ def add_property():
     return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id.inserted_id)}), 201)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['DELETE'])
+@landlord_required
 def delete_property(property_id):
     result = properties.delete_one({'_id': ObjectId(property_id)})
     if result.deleted_count == 1:
