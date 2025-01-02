@@ -1,6 +1,6 @@
 import datetime, jwt, bcrypt, globals
 from flask import Blueprint, make_response, jsonify, request
-from decorators import jwt_required
+from decorators import jwt_required, landlord_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -17,7 +17,8 @@ def login():
         if user is not None:
             if bcrypt.checkpw(bytes(auth.password, 'UTF-8'), user['password']):
                 token = jwt.encode({
-                    'user': user['email'],
+                    'user': user['username'],
+                    'user_id': str(user['_id']),
                     'role': user['role'],
                     'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=90)
                 }, globals.secret_key ,algorithm='HS256')
