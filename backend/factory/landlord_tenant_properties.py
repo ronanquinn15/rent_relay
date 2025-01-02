@@ -10,7 +10,12 @@ properties_collection = db.properties
 
 fake = Faker()
 
+
 def generate_landlord_data():
+    existing_landlord = landlords_collection.find_one({'username': 'landlord'})
+    if existing_landlord:
+        return [existing_landlord]
+
     landlord_data = {
         'name': 'John Doe',
         'username': 'landlord',
@@ -19,7 +24,7 @@ def generate_landlord_data():
         'password': bcrypt.hashpw(b"password", bcrypt.gensalt()),
     }
     landlords_collection.insert_one(landlord_data)
-    return list(landlords_collection.find())
+    return [landlord_data]
 
 
 def generate_tenant_data(properties):
@@ -87,7 +92,7 @@ def generate_tenant_in_property_data(properties, tenants):
     for i in range(min(len(properties), len(tenants))):
         tenant = tenants[i]
         property = properties[i]
-        properties_collection.update_one({'_id': property['_id']}, {'$set': {'tenant_ids': [tenant['_id']]}})
+        properties_collection.update_one({'_id': property['_id']}, {'$set': {'tenant_id': tenant['_id']}})
 
 
 # Generating Landlord Data
