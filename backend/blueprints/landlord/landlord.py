@@ -1,13 +1,14 @@
 import bcrypt, globals
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import jwt_required, landlord_required, admin_required,tenant_required
+from decorators import landlord_required, admin_required
 
 landlord_bp = Blueprint('landlord', __name__)
 
 landlords = globals.db.landlords
 
 @landlord_bp.route('/api/landlords', methods=['GET'])
+@admin_required
 def get_all_landlords():
     landlords_list = []
     for landlord in landlords.find({}, {'password': 0}):
@@ -16,6 +17,7 @@ def get_all_landlords():
     return make_response(jsonify(landlords_list), 200)
 
 @landlord_bp.route('/api/landlords' , methods=['POST'])
+@admin_required
 def add_landlord():
     fields = ['name', 'username', 'password', 'email']
     if not all(field in request.form for field in fields):
@@ -32,6 +34,7 @@ def add_landlord():
     return make_response(jsonify({'_id': str(newly_created_landlord)}), 201)
 
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['PUT'])
+@landlord_required
 def edit_landlord(landlord_id):
     fields = ['name', 'username', 'email', 'password']
     update_fields = {}
@@ -58,6 +61,7 @@ def edit_landlord(landlord_id):
 
 
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['DELETE'])
+@admin_required
 def delete_landlord(landlord_id):
     result = landlords.delete_one({'_id': ObjectId(landlord_id)})
     if result.deleted_count == 1:
