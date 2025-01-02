@@ -1,7 +1,7 @@
-import bcrypt, globals, jwt
+import globals, jwt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import jwt_required, landlord_required, admin_required,tenant_required
+from decorators import landlord_required
 
 properties_bp = Blueprint('properties', __name__)
 
