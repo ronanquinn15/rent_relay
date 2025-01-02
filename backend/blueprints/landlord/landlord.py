@@ -1,5 +1,4 @@
-import datetime, jwt, bcrypt, globals
-
+import bcrypt, globals
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import jwt_required, landlord_required, admin_required,tenant_required
