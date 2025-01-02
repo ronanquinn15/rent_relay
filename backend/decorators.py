@@ -26,8 +26,13 @@ def jwt_required(func):
 def admin_required(f):
     @wraps(f)
     def admin_required_wrapper(*args, **kwargs):
-        token = request.headers['x-access-token']
-        data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        token = request.headers.get('x-access-token')
+        if not token:
+            return make_response(jsonify({'error': 'Token is missing'}), 401)
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({'error': 'Token is invalid'}), 401)
         if data['role'] == 'admin':
             return f(*args, **kwargs)
         else:
@@ -37,8 +42,13 @@ def admin_required(f):
 def landlord_required(f):
     @wraps(f)
     def landlord_required_wrapper(*args, **kwargs):
-        token = request.headers['x-access-token']
-        data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        token = request.headers.get('x-access-token')
+        if not token:
+            return make_response(jsonify({'error': 'Token is missing'}), 401)
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({'error': 'Token is invalid'}), 401)
         if data['role'] == 'landlord':
             return f(*args, **kwargs)
         else:
@@ -48,8 +58,13 @@ def landlord_required(f):
 def tenant_required(f):
     @wraps(f)
     def tenant_required_wrapper(*args, **kwargs):
-        token = request.headers['x-access-token']
-        data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        token = request.headers.get('x-access-token')
+        if not token:
+            return make_response(jsonify({'error': 'Token is missing'}), 401)
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({'error': 'Token is invalid'}), 401)
         if data['role'] == 'tenant':
             return f(*args, **kwargs)
         else:
