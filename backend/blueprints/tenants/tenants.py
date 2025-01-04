@@ -1,9 +1,7 @@
 import globals, jwt, bcrypt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import landlord_required
-
-from backend.decorators import admin_required
+from decorators import landlord_required, admin_required, tenant_required
 
 tenants_bp = Blueprint('tenants', __name__)
 
