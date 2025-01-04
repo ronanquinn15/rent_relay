@@ -1,4 +1,4 @@
-import globals, jwt, datetime
+import globals, jwt, datetime, bson
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, tenant_required
@@ -122,12 +122,17 @@ def get_all_requests_based_off_tenant():
         return make_response(jsonify({'error': 'No maintenance requests found for this tenant'}), 404)
     return make_response(jsonify(requests_list), 200)
 
-@maintenance_bp.route('/api/maintenance/<request_id>', methods=['GET'])
+@maintenance_bp.route('/api/maintenance/received/<request_id>', methods=['GET'])
 @landlord_required
-def get_maintenance_request(request_id):
+def get_maintenance_request_landlord(request_id):
     landlord_id = auto_populate_landlord_id()
     if not landlord_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    try:
+        request_obj_id = ObjectId(request_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid request_id'}), 400)
 
     # Get all properties owned by landlord
     properties_list = properties.find({'landlord_id': ObjectId(landlord_id)}, {'_id': 1})
@@ -136,7 +141,7 @@ def get_maintenance_request(request_id):
     if not property_ids:
         return make_response(jsonify({'error': 'No properties found for this landlord'}), 404)
 
-    request = maintenance.find_one({'_id': ObjectId(request_id), 'property_id': {'$in': property_ids}})
+    request = maintenance.find_one({'_id': request_obj_id, 'property_id': {'$in': property_ids}})
     if request:
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
@@ -146,14 +151,19 @@ def get_maintenance_request(request_id):
         return make_response(jsonify({'error': 'Maintenance request not found'}), 404)
 
 
-@maintenance_bp.route('/api/maintenance/tenant/<request_id>', methods=['GET'])
+@maintenance_bp.route('/api/maintenance/submitted/<request_id>', methods=['GET'])
 @tenant_required
 def get_maintenance_request_tenant(request_id):
     tenant_id = auto_populate_tenant_id()
     if not tenant_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
-    request = maintenance.find_one({'_id': ObjectId(request_id), 'tenant_id': ObjectId(tenant_id)})
+    try:
+        request_obj_id = ObjectId(request_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid request_id'}), 400)
+
+    request = maintenance.find_one({'_id': request_obj_id, 'tenant_id': tenant_id})
     if request:
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
@@ -165,6 +175,11 @@ def get_maintenance_request_tenant(request_id):
 @maintenance_bp.route('/api/maintenance/<request_id>', methods=['PUT'])
 @landlord_required
 def update_maintenance_request(request_id):
+    try:
+        request_obj_id = ObjectId(request_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid request_id'}), 400)
+
     fields = ['complete']
     updated_information = {}
     if not any(field in request.form for field in fields):
@@ -181,7 +196,7 @@ def update_maintenance_request(request_id):
                     return make_response(jsonify({'error': 'Invalid value'}), 400)
 
     if updated_information:
-        result = maintenance.update_one({'_id': ObjectId(request_id)}, {'$set': updated_information})
+        result = maintenance.update_one({'_id': request_obj_id}, {'$set': updated_information})
         if result.modified_count == 1:
             return make_response(jsonify({'message': 'Maintenance request updated'}), 200)
         else:
@@ -196,7 +211,12 @@ def delete_maintenance_request(request_id):
     if not tenant_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
-    result = maintenance.delete_one({'_id': ObjectId(request_id), 'tenant_id': ObjectId(tenant_id)})
+    try:
+        request_obj_id = ObjectId(request_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid request_id'}), 400)
+
+    result = maintenance.delete_one({'_id': request_obj_id, 'tenant_id': tenant_id})
     if result.deleted_count == 1:
         return make_response(jsonify({'message': 'Maintenance request deleted'}), 200)
     else:

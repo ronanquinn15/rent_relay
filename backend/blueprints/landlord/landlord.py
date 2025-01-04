@@ -1,4 +1,4 @@
-import bcrypt, globals, jwt
+import bcrypt, globals, jwt, bson
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, admin_required
@@ -50,6 +50,11 @@ def add_landlord():
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['PUT'])
 @landlord_required
 def edit_landlord(landlord_id):
+    try:
+        landlord_obj_id = ObjectId(landlord_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid landlord_id'}), 400)
+
     token_landlord_id = auto_populate_landlord_id()
     if not token_landlord_id or token_landlord_id != landlord_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
@@ -70,7 +75,7 @@ def edit_landlord(landlord_id):
     if not update_fields:
         return make_response(jsonify({'error': 'No fields to update'}), 400)
 
-    result = landlords.update_one({'_id': ObjectId(landlord_id)}, {'$set': update_fields})
+    result = landlords.update_one({'_id': landlord_obj_id}, {'$set': update_fields})
     if result.modified_count == 1:
         return make_response(jsonify({'message': 'Landlord updated'}), 200)
     else:
@@ -79,9 +84,14 @@ def edit_landlord(landlord_id):
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['DELETE'])
 @admin_required
 def delete_landlord(landlord_id):
-    result = landlords.delete_one({'_id': ObjectId(landlord_id)})
+    try:
+        landlord_obj_id = ObjectId(landlord_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid landlord_id'}), 400)
+
+    result = landlords.delete_one({'_id': landlord_obj_id})
     if result.deleted_count == 1:
-        properties.update_many({'landlord_id': ObjectId(landlord_id)}, {'$set': {'landlord_id': None}})
+        properties.update_many({'landlord_id': landlord_obj_id}, {'$set': {'landlord_id': None}})
         return make_response(jsonify({'message': 'Landlord deleted'}), 200)
     else:
         return make_response(jsonify({'error': 'Landlord not found'}), 404)
