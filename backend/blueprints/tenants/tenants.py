@@ -1,12 +1,25 @@
-import globals, bcrypt, bson
+import globals, bcrypt, bson, jwt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import admin_required, tenant_required
+from decorators import admin_required, tenant_required, landlord_required
 
 tenants_bp = Blueprint('tenants', __name__)
 
 tenants = globals.db.tenants
 properties = globals.db.properties
+
+def auto_populate_landlord_id():
+    token = request.headers.get('x-access-token')
+    if token:
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+            if data['role'] == 'landlord':
+                return ObjectId(data['user_id'])
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+    return None
 
 @tenants_bp.route('/api/tenants', methods=['GET'])
 @admin_required
@@ -105,4 +118,26 @@ def delete_tenant(tenant_id):
     else:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
 
+@tenants_bp.route('/api/tenants/property', methods=['GET'])
+@landlord_required
+def get_tenants_on_each_prop():
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
+    properties_list = []
+
+    for property in properties.find({'landlord_id': ObjectId(landlord_id)}):
+        property['_id'] = str(property['_id'])
+        property['landlord_id'] = str(property['landlord_id'])
+        property['tenant_id'] = str(property['tenant_id'])
+
+        tenant_details = []
+        if property['tenant_id']:
+            tenant = tenants.find_one({'_id': ObjectId(property['tenant_id'])}, {'password': 0, '_id': 0, 'property_id': 0})
+            if tenant:
+                tenant_details.append(tenant)
+        property['tenant_details'] = tenant_details
+        properties_list.append(property)
+
+    return make_response(jsonify(properties_list), 200)
