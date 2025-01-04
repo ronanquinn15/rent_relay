@@ -1,4 +1,4 @@
-import bcrypt, globals
+import bcrypt, globals, jwt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, admin_required
@@ -6,6 +6,19 @@ from decorators import landlord_required, admin_required
 landlord_bp = Blueprint('landlord', __name__)
 
 landlords = globals.db.landlords
+
+def auto_populate_landlord_id():
+    token = request.headers.get('x-access-token')
+    if token:
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+            if data['role'] == 'landlord':
+                return data['user_id']
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+    return None
 
 @landlord_bp.route('/api/landlords', methods=['GET'])
 @admin_required
@@ -36,6 +49,10 @@ def add_landlord():
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['PUT'])
 @landlord_required
 def edit_landlord(landlord_id):
+    token_landlord_id = auto_populate_landlord_id()
+    if not token_landlord_id or token_landlord_id != landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
     fields = ['name', 'username', 'email', 'password']
     update_fields = {}
 
@@ -57,8 +74,6 @@ def edit_landlord(landlord_id):
         return make_response(jsonify({'message': 'Landlord updated'}), 200)
     else:
         return make_response(jsonify({'error': 'Landlord not found'}), 404)
-
-
 
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['DELETE'])
 @admin_required
