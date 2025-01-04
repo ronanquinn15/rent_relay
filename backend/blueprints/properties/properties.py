@@ -1,7 +1,7 @@
 import globals, jwt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import landlord_required
+from decorators import landlord_required, admin_required
 
 properties_bp = Blueprint('properties', __name__)
 
@@ -55,6 +55,23 @@ def get_property(property_id):
         property['tenant_id'] = str(property['tenant_id'])
         return make_response(jsonify(property), 200)
     return make_response(jsonify({'error': 'Property not found or unauthorised access'}), 404)
+
+@properties_bp.route('/api/properties/<property_id>/update_landlord', methods=['PUT'])
+@admin_required
+def update_property_landlord(property_id):
+    if 'landlord_id' not in request.form:
+        return make_response(jsonify({'error': 'Missing landlord_id'}), 400)
+
+    new_landlord_id = request.form['landlord_id']
+    landlord = landlords.find_one({'_id': ObjectId(new_landlord_id)})
+    if not landlord:
+        return make_response(jsonify({'error': 'Landlord not found'}), 404)
+
+    result = properties.update_one({'_id': ObjectId(property_id)}, {'$set': {'landlord_id': ObjectId(new_landlord_id)}})
+    if result.modified_count == 1:
+        return make_response(jsonify({'message': 'Property landlord updated'}), 200)
+    else:
+        return make_response(jsonify({'error': 'Property not found'}), 404)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['PUT'])
 @landlord_required
