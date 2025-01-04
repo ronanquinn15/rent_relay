@@ -15,7 +15,7 @@ def auto_populate_landlord_id():
         try:
             data = jwt.decode(token, globals.secret_key, algorithms='HS256')
             if data['role'] == 'landlord':
-                return data['user_id']
+                return ObjectId(data['user_id'])
         except jwt.ExpiredSignatureError:
             return None
         except jwt.InvalidTokenError:
@@ -25,30 +25,49 @@ def auto_populate_landlord_id():
 @properties_bp.route('/api/properties', methods=['GET'])
 @landlord_required
 def get_all_properties():
-    properties_list = []
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorised'}), 404)
 
-    for prop in properties.find():
+    properties_list = []
+    for prop in properties.find({'landlord_id': ObjectId(landlord_id)}):
         prop['_id'] = str(prop['_id'])
         prop['landlord_id'] = str(prop['landlord_id'])
         prop['tenant_id'] = str(prop['tenant_id'])
         properties_list.append(prop)
+
+    if not properties_list:
+        return make_response(jsonify({'message': 'No properties are registered for this landlord'}), 404)
+
     return make_response(jsonify(properties_list), 200)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['GET'])
 @landlord_required
 def get_property(property_id):
-    property = properties.find_one({'_id': ObjectId(property_id)})
-    if property is not None:
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorised'}), 401)
+
+    property = properties.find_one({'_id': ObjectId(property_id), 'landlord_id': ObjectId(landlord_id)})
+    if property:
         property['_id'] = str(property['_id'])
         property['landlord_id'] = str(property['landlord_id'])
         property['tenant_id'] = str(property['tenant_id'])
         return make_response(jsonify(property), 200)
-    return make_response(jsonify({'error': 'Property not found'}), 404)
+    return make_response(jsonify({'error': 'Property not found or unauthorised access'}), 404)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['PUT'])
 @landlord_required
 def update_property(property_id):
-    fields = ['number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date']
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    property = properties.find_one({'_id': ObjectId(property_id), 'landlord_id': ObjectId(landlord_id)})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
+
+    fields = ['number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'tenant_id']
     updated_information = {}
     if not any(field in request.form for field in fields):
         return make_response(jsonify({'error': 'No fields to update'}), 400)
@@ -60,12 +79,22 @@ def update_property(property_id):
                     updated_information[f'{field}'] = int(request.form[field])
                 except ValueError:
                     return make_response(jsonify({'error': 'Invalid value'}), 400)
-            else:
-                updated_information[f'{field}'] = request.form[field]
+            elif field == 'tenant_id':
+                tenant_id = request.form['tenant_id']
+                tenant = tenants.find_one({'_id': ObjectId(tenant_id)})
+                if not tenant:
+                    return make_response(jsonify({'error': 'Tenant not found'}), 404)
+                if tenant['property_id']:
+                    return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
+                if property.get('tenant_id'):
+                    return make_response(jsonify({'error': 'Property already has a tenant'}), 400)
+                updated_information['tenant_id'] = ObjectId(tenant_id)
 
     if updated_information:
         result = properties.update_one({'_id': ObjectId(property_id)}, {'$set': updated_information})
         if result.modified_count == 1:
+            if 'tenant_id' in updated_information:
+                tenants.update_one({'_id': ObjectId(updated_information['tenant_id'])}, {'$set': {'property_id': ObjectId(property_id)}})
             return make_response(jsonify({'message': 'Property updated'}), 200)
         else:
             return make_response(jsonify({'error': 'Property not found'}), 404)
@@ -75,14 +104,20 @@ def update_property(property_id):
 @properties_bp.route('/api/properties', methods=['POST'])
 @landlord_required
 def add_property():
-    fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date',
-              'number_of_tenants', 'tenant_id']
+    fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'number_of_tenants', 'tenant_id']
     if not all(field in request.form for field in fields):
         return make_response(jsonify({"error": "Missing form data."}), 400)
 
     landlord_id = auto_populate_landlord_id()
     if not landlord_id:
         return make_response(jsonify({'error': 'Landlord not found'}), 404)
+
+    tenant_id = request.form['tenant_id']
+    tenant = tenants.find_one({'_id': ObjectId(tenant_id)})
+    if not tenant:
+        return make_response(jsonify({'error': 'Tenant not found'}), 404)
+    if tenant['property_id']:
+        return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
 
     new_property = {
         'address': str(request.form['address']),
@@ -94,14 +129,30 @@ def add_property():
         'purchase_date': int(request.form['purchase_date']),
         'landlord_id': landlord_id,
         'number_of_tenants': int(request.form['number_of_tenants']),
-        'tenant_id': ObjectId(request.form['tenant_id']) if 'tenant_id' in request.form and tenants.find_one({'_id': ObjectId(request.form['tenant_id'])}) else None
+        'tenant_id': ObjectId(tenant_id)
     }
-    new_property_id = properties.insert_one(new_property)
-    return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id.inserted_id)}), 201)
+    new_property_id = properties.insert_one(new_property).inserted_id
+
+    # Update tenant with property_id
+    tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': new_property_id}})
+
+    return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id)}), 201)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['DELETE'])
 @landlord_required
 def delete_property(property_id):
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    property = properties.find_one({'_id': ObjectId(property_id), 'landlord_id': landlord_id})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
+
+    tenant_id = property.get('tenant_id')
+    if tenant_id:
+        tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': None}})
+
     result = properties.delete_one({'_id': ObjectId(property_id)})
     if result.deleted_count == 1:
         return make_response(jsonify({'message': 'Property deleted'}), 200)
