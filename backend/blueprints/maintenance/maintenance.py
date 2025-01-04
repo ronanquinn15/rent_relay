@@ -28,7 +28,7 @@ def auto_populate_landlord_id():
         try:
             data = jwt.decode(token, globals.secret_key, algorithms='HS256')
             if data['role'] == 'landlord':
-                return data['user_id']
+                return ObjectId(data['user_id'])
         except jwt.ExpiredSignatureError:
             return None
         except jwt.InvalidTokenError:
@@ -83,7 +83,7 @@ def get_all_maintenance_requests():
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
     # Get all properties owned by landlord
-    properties_list = properties.find({'landlord_id': ObjectId(landlord_id)}, {'_id': 1})
+    properties_list = properties.find({'landlord_id': landlord_id}, {'_id': 1})
     property_ids = [prop['_id'] for prop in properties_list]
 
     if not property_ids:
