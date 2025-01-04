@@ -6,6 +6,7 @@ from decorators import landlord_required, admin_required
 landlord_bp = Blueprint('landlord', __name__)
 
 landlords = globals.db.landlords
+properties = globals.db.properties
 
 def auto_populate_landlord_id():
     token = request.headers.get('x-access-token')
@@ -80,6 +81,7 @@ def edit_landlord(landlord_id):
 def delete_landlord(landlord_id):
     result = landlords.delete_one({'_id': ObjectId(landlord_id)})
     if result.deleted_count == 1:
+        properties.update_many({'landlord_id': ObjectId(landlord_id)}, {'$set': {'landlord_id': None}})
         return make_response(jsonify({'message': 'Landlord deleted'}), 200)
     else:
         return make_response(jsonify({'error': 'Landlord not found'}), 404)
