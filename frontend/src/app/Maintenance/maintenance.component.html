@@ -1,0 +1,30 @@
+<div class="container" style="margin-top: 70px">
+  <div class="row">
+    <div class="col-sm-12">
+      @for (request of maintenanceRequests; track request._id){
+        <div class="card text-white bg-primary mb-3"
+             style="cursor: pointer"
+             [routerLink]="['/maintenance', request._id]">
+          <div class="card-header">
+            This request was submitted for this Property ID{{ request.property_id }}
+          </div>
+          <div class="card-body">
+            {{ request.description }}.
+          </div>
+          <div class="card-body">
+            This request is not complete
+          </div>
+          <div class="card-body">
+            This maintenance request was submitted on {{ request.request_date }}.
+          </div>
+          <div class="card-body">
+            Level of Urgency: {{ request.urgency }}.
+          </div>
+          <div class="card-footer">
+            This maintenance request was submitted by {{ request.tenant_id }}.
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
