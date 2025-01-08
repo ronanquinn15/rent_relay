@@ -1,3 +1,10 @@
 <h1 style="margin-top: 70px">
-  Workout Tracker
+  Overview of all your Registered Properties
 </h1>
+<ag-grid-angular
+  class="ag-theme-alpine"
+  style="width: 100%"
+  [rowData]="data"
+  [columnDefs]="headings"
+  [gridOptions]="gridOptions">
+</ag-grid-angular>

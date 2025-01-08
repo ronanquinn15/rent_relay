@@ -6,6 +6,7 @@ import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-community';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'home',
   templateUrl: './home.component.html',
@@ -16,29 +17,36 @@ import { FormsModule } from '@angular/forms';
 
 export class HomeComponent {
 
-  /**headings: ColDef[] = [
-    { field: "" },
-    { field: "" },
-    { field: "" },
-    { field: "" },
-    { field: "" },
-    { field: "" },
-    { field: "" },
-  ];*/
+  headings: ColDef[] = [
+    { field: "address" },
+    { field: "city" },
+    { field: "postcode" },
+    { field: "number_of_bathrooms", headerName: "Number of Bathrooms" },
+    { field: "number_of_bedrooms", headerName: "Number of Bedrooms" },
+    { field: "number_of_tenants", headerName: "Number of Tenants" },
+    { field: "purchase_date", headerName: "Purchase Date" },
+    { field: "rent" },
+  ];
 
-  // data: any = [];
+  data: any = [];
 
-  /**gridOptions = {
+  gridOptions = {
     columnDefs: this.headings,
-    rowData: this.filteredData,
+    rowData: this.data,
     defaultColDef: {
       flex: 1,
       minWidth: 100,
     },
-  };*/
+    domLayout: 'autoHeight' as 'autoHeight',
+  };
 
   constructor(private webService: WebService) { }
 
+  ngOnInit() {
+    this.webService.getProperties().subscribe((resp) => {
+        this.data = resp;
+    });
+  }
 
 
 }
