@@ -18,7 +18,7 @@ export class NavigationComponent {
   constructor(private webService: WebService) {}
 
   checkAuthStatus(): boolean {
-    return !!sessionStorage.getItem('x-access-token');
+    return !!sessionStorage.getItem('token');
   }
 
   updateAuthStatus() {

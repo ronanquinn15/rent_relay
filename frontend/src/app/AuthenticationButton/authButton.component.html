@@ -1,0 +1,11 @@
+<ng-container *ngIf="isLoggedIn(); else loggedOut">
+  <button class="btn btn-outline-light" (click)="logout()">
+    Log Out
+  </button>
+</ng-container>
+
+<ng-template #loggedOut>
+  <button class="btn btn-outline-light" (click)="login()">
+    Log In
+  </button>
+</ng-template>
