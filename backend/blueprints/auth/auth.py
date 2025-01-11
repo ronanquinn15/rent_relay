@@ -22,7 +22,7 @@ def login():
                     'role': user['role'],
                     'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=90)
                 }, globals.secret_key ,algorithm='HS256')
-                return make_response(jsonify({'token': token}), 200)
+                return make_response(jsonify({'token': token, 'role': user['role']}), 200)
             else:
                 return make_response(jsonify({'error': 'Password is incorrect'}), 401)
         else:
