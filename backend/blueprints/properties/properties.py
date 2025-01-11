@@ -199,3 +199,56 @@ def delete_property(property_id):
     if result.deleted_count == 1:
         return make_response(jsonify({'message': 'Property deleted'}), 200)
     return make_response(jsonify({'error': 'Property not found'}), 404)
+
+@properties_bp.route('/api/tenants/property', methods=['GET'])
+@landlord_required
+def get_tenants_on_each_prop():
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    properties_list = []
+
+    for property in properties.find({'landlord_id': ObjectId(landlord_id)}):
+        property['_id'] = str(property['_id'])
+        property['landlord_id'] = str(property['landlord_id'])
+        property['tenant_id'] = str(property['tenant_id'])
+
+        tenant_details = []
+        if property['tenant_id']:
+            tenant = tenants.find_one({'_id': ObjectId(property['tenant_id'])}, {'password': 0, '_id': 0, 'property_id': 0})
+            if tenant:
+                tenant_details.append(tenant)
+        property['tenant_details'] = tenant_details
+        properties_list.append(property)
+
+    return make_response(jsonify(properties_list), 200)
+
+@properties_bp.route('/api/tenants/property/<property_id>', methods=['GET'])
+@landlord_required
+def get_one_prop_with_tenants(property_id):
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    try:
+        property_obj_id = ObjectId(property_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid property_id'}), 400)
+
+    property = properties.find_one({'_id': property_obj_id, 'landlord_id': ObjectId(landlord_id)})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
+
+    property['_id'] = str(property['_id'])
+    property['landlord_id'] = str(property['landlord_id'])
+    property['tenant_id'] = str(property['tenant_id'])
+
+    tenant_details = []
+    if property['tenant_id']:
+        tenant = tenants.find_one({'_id': ObjectId(property['tenant_id'])}, {'password': 0, '_id': 0, 'property_id': 0})
+        if tenant:
+            tenant_details.append(tenant)
+    property['tenant_details'] = tenant_details
+
+    return make_response(jsonify(property), 200)
