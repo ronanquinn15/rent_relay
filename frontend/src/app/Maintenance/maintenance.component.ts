@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { WebService } from '../WebService/web.service';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import {AsyncPipe} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'maintenance',

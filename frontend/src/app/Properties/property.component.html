@@ -1,0 +1,27 @@
+<div class="container" style="margin-top: 70px">
+  <div class="row">
+    <div class="col-sm-12">
+      @for (prop of properties; track prop._id){
+        <div class="card text-white bg-primary mb-3"
+             style="cursor: pointer"
+             [routerLink]="['/properties-tenants', prop._id]">
+          <div class="card-header">
+            This Property ID: {{ prop._id }}
+          </div>
+          <div class="card-header">
+            Address: {{prop.address}}, {{prop.city}}, {{prop.postcode}}
+          </div>
+          <div class="card-body">
+            This property has {{ prop.number_of_bathrooms }} bathrooms and {{ prop.number_of_bedrooms }} bedrooms.
+          </div>
+          <div class="card-body">
+            This property was purchased in {{ prop.purchase_date }}.
+          </div>
+          <div class="card-footer">
+            The property is occupied by {{ prop.number_of_tenants }} tenant(s).
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
