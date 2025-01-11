@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { AsyncPipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../AuthenticationService/authService.component';
 
 @Component({
   selector: 'auth-button',
@@ -15,11 +16,14 @@ import { CommonModule } from '@angular/common';
 })
 export class AuthButtonComponent {
   @Output() authStatusChanged = new EventEmitter<void>();
+  userRole: string = '';
 
-  constructor(private webService: WebService, private router: Router, @Inject(DOCUMENT) private document: Document) {}
+  constructor(private webService: WebService, private router: Router, @Inject(DOCUMENT) private document: Document, private authService: AuthService) {
+    this.userRole = this.authService.getUserRole();
+  }
 
   isLoggedIn(): boolean {
-    return !!sessionStorage.getItem('token');
+    return this.authService.isLoggedIn();
   }
 
   login() {
@@ -29,7 +33,7 @@ export class AuthButtonComponent {
   logout() {
     this.webService.getLogout().subscribe(
       resp => {
-        sessionStorage.removeItem('token');
+        this.authService.logout();
         this.router.navigate(['/']);
         this.authStatusChanged.emit();
         console.log('Logged out');

@@ -14,7 +14,7 @@ export const routes: Routes = [
     component: UserAuthComponent,
   },
   {
-    path: 'properties-tenants',
+    path: 'landlords/properties',
     component: PropertyComponent
   },
   {

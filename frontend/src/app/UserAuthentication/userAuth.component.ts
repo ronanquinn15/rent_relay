@@ -23,6 +23,7 @@ export class UserAuthComponent {
       response => {
         console.log('Successfully Logged In', response);
         sessionStorage.setItem('token', response.token);
+        sessionStorage.setItem('role', response.role);
         window.location.href = '/';
 
       },

@@ -31,6 +31,7 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // Used for AG-Grid
   getProperties(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/properties';
     const token = sessionStorage.getItem('token');
@@ -40,8 +41,8 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
-  getMaintenanceRequests(): Observable<any> {
-    const url = 'http://127.0.0.1:5000/api/maintenance';
+  getPropertyWithTenants(): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/tenants/property';
     const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'x-access-token': token || ''
@@ -49,8 +50,17 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
-  getPropertyWithTenants(): Observable<any> {
-    const url = 'http://127.0.0.1:5000/api/tenants/property';
+  getOneProperty(propertyId: string): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/tenants/property' + propertyId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, { headers });
+  }
+
+  getMaintenanceRequests(): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/maintenance';
     const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'x-access-token': token || ''
