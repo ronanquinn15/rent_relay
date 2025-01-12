@@ -1,7 +1,7 @@
 <div class="container mt-5">
   <div class="card shadow-lg">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h2>{{ property.name }}</h2>
+      <h2>{{ property.address }}</h2>
       <span class="badge badge-light">Property ID: {{ property._id }}</span>
     </div>
     <div class="card-body">
@@ -32,7 +32,7 @@
       </ul>
     </div>
     <div class="card-footer text-muted">
-      <p><i class="fas fa-clock"></i> Last updated: {{ property.last_updated | date:'short' }}</p>
+      <button class="btn btn-primary" (click)="navigateToEdit()">Edit Property</button>
     </div>
   </div>
 </div>

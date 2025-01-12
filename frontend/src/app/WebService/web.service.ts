@@ -59,6 +59,25 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  updateProperty(propertyId: string, property: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('address', property.address);
+    postData.append('postcode', property.postcode);
+    postData.append('city', property.city);
+    postData.append('number_of_bedrooms', property.number_of_bedrooms);
+    postData.append('number_of_bathrooms', property.number_of_bathrooms);
+    postData.append('number_of_tenants', property.number_of_tenants);
+    postData.append('rent', property.rent);
+    postData.append('tenant_id', property.tenant_id);
+    postData.append('purchase_date', property.purchase_date);
+    const url = 'http://127.0.0.1:5000/api/properties/' + propertyId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.put(url, postData, { headers });
+  }
+
   getMaintenanceRequests(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/maintenance';
     const token = sessionStorage.getItem('token');

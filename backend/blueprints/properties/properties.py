@@ -1,4 +1,5 @@
 import globals, jwt, bson
+from datetime import datetime
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, admin_required
@@ -22,24 +23,24 @@ def auto_populate_landlord_id():
             return None
     return None
 
-# @properties_bp.route('/api/properties', methods=['GET'])
-# @landlord_required
-# def get_all_properties():
-#     landlord_id = auto_populate_landlord_id()
-#     if not landlord_id:
-#         return make_response(jsonify({'error': 'Unauthorised'}), 404)
-#
-#     properties_list = []
-#     for prop in properties.find({'landlord_id': ObjectId(landlord_id)}):
-#         prop['_id'] = str(prop['_id'])
-#         prop['landlord_id'] = str(prop['landlord_id'])
-#         prop['tenant_id'] = str(prop['tenant_id'])
-#         properties_list.append(prop)
-#
-#     if not properties_list:
-#         return make_response(jsonify({'message': 'No properties are registered for this landlord'}), 404)
-#
-#     return make_response(jsonify(properties_list), 200)
+@properties_bp.route('/api/properties', methods=['GET'])
+@landlord_required
+def get_all_properties():
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorised'}), 404)
+
+    properties_list = []
+    for prop in properties.find({'landlord_id': ObjectId(landlord_id)}):
+        prop['_id'] = str(prop['_id'])
+        prop['landlord_id'] = str(prop['landlord_id'])
+        prop['tenant_id'] = str(prop['tenant_id'])
+        properties_list.append(prop)
+
+    if not properties_list:
+        return make_response(jsonify({'message': 'No properties are registered for this landlord'}), 404)
+
+    return make_response(jsonify(properties_list), 200)
 
 # @properties_bp.route('/api/properties/<property_id>', methods=['GET'])
 # @landlord_required
@@ -253,7 +254,6 @@ def get_one_prop_with_tenants(property_id):
 
     return make_response(jsonify(property), 200)
 
-
 @properties_bp.route('/api/properties/<property_id>', methods=['PUT'])
 @landlord_required
 def update_property(property_id):
@@ -276,27 +276,36 @@ def update_property(property_id):
 
     for field in update_fields:
         if field in request.form:
-            updated_information[field] = request.form[field]
+            if field == 'purchase_date':
+                try:
+                    # Validate and reformat the purchase_date
+                    purchase_date = datetime.strptime(request.form[field], '%Y/%m/%d')
+                    updated_information[field] = purchase_date.strftime('%Y/%m/%d')
+                except ValueError:
+                    return make_response(jsonify({'error': 'Invalid date format, should be yyyy/mm/dd'}), 400)
+            else:
+                updated_information[field] = request.form[field]
 
     if 'tenant_id' in request.form:
         tenant_id = request.form['tenant_id']
-        try:
-            tenant_obj_id = ObjectId(tenant_id)
-        except bson.errors.InvalidId:
-            return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
+        if tenant_id != str(property.get('tenant_id')):  # Check if tenant_id is different
+            try:
+                tenant_obj_id = ObjectId(tenant_id)
+            except bson.errors.InvalidId:
+                return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
 
-        tenant = tenants.find_one({'_id': tenant_obj_id})
-        if not tenant:
-            return make_response(jsonify({'error': 'Tenant not found'}), 404)
-        if tenant.get('property_id'):
-            return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
+            tenant = tenants.find_one({'_id': tenant_obj_id})
+            if not tenant:
+                return make_response(jsonify({'error': 'Tenant not found'}), 404)
+            if tenant.get('property_id'):
+                return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
 
-        # Set the old tenant's property_id to None
-        if property.get('tenant_id'):
-            old_tenant_id = property['tenant_id']
-            tenants.update_one({'_id': old_tenant_id}, {'$set': {'property_id': None}})
+            # Set the old tenant's property_id to None
+            if property.get('tenant_id'):
+                old_tenant_id = property['tenant_id']
+                tenants.update_one({'_id': old_tenant_id}, {'$set': {'property_id': None}})
 
-        updated_information['tenant_id'] = tenant_obj_id
+            updated_information['tenant_id'] = tenant_obj_id
 
     if updated_information:
         result = properties.update_one({'_id': property_obj_id}, {'$set': updated_information})

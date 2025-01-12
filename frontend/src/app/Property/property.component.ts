@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WebService } from '../WebService/web.service';
@@ -8,14 +8,14 @@ import { WebService } from '../WebService/web.service';
   selector: 'app-property',
   templateUrl: './property.component.html',
   styleUrls: ['./property.component.css'],
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   providers: [WebService],
   standalone: true
 })
 export class PropertyComponent implements OnInit {
-  property: any;
+  property: any = {};
 
-  constructor(private webService: WebService, private route: ActivatedRoute) { }
+  constructor(private webService: WebService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     const propertyId = this.route.snapshot.paramMap.get('id');
@@ -23,6 +23,15 @@ export class PropertyComponent implements OnInit {
       this.webService.getOneProperty(propertyId).subscribe((response) => {
         this.property = response;
       });
+    } else {
+      console.error('Property ID not found in route parameters');
+    }
+  }
+
+  navigateToEdit() {
+    const propertyId = this.route.snapshot.paramMap.get('id');
+    if (propertyId) {
+      this.router.navigate([`/landlords/properties/${propertyId}/edit`]);
     } else {
       console.error('Property ID not found in route parameters');
     }

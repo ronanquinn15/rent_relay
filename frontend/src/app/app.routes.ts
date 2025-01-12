@@ -4,6 +4,7 @@ import { UserAuthComponent } from './UserAuthentication/userAuth.component';
 import { MaintenanceComponent } from './Maintenance/maintenance.component';
 import { PropertiesComponent } from './Properties/properties.component';
 import {PropertyComponent} from './Property/property.component';
+import {EditPropertyComponent} from './EditProperty/editProperty.component';
 
 export const routes: Routes = [
   {
@@ -21,6 +22,10 @@ export const routes: Routes = [
   {
     path: 'landlords/properties/:id',
     component: PropertyComponent
+  },
+  {
+    path: 'landlords/properties/:id/edit',
+    component: EditPropertyComponent
   },
   {
     path: 'maintenance',
