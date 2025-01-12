@@ -39,13 +39,17 @@ export class EditMaintenanceComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
-    const updatedRequest = {
-      ...this.maintenanceRequest,
-      status: this.maintenanceForm.value.status
-    };
-    this.webService.updateMaintenanceRequest(this.maintenanceId, updatedRequest).subscribe(() => {
-      this.router.navigate(['/landlords/properties', this.maintenanceId]);
-    });
+  getStatus(status: boolean): string {
+    return status ? 'Completed' : 'Pending';
   }
+
+  onSubmit(): void {
+  const updatedRequest = {
+    ...this.maintenanceRequest,
+    status: this.maintenanceForm.value.status
+  };
+  this.webService.updateMaintenanceRequest(this.maintenanceId, updatedRequest).subscribe(() => {
+    this.router.navigate(['/maintenance']);
+  });
+}
 }

@@ -10,7 +10,7 @@
           <p><strong>Description:</strong> {{ maintenanceRequest.description }}</p>
           <p><strong>Request Date:</strong> {{ maintenanceRequest.request_date }}</p>
           <p><strong>Urgency:</strong> {{ maintenanceRequest.urgency }}</p>
-          <p><strong>Status:</strong> {{ maintenanceRequest.status ? 'Complete' : 'Incomplete' }}</p>
+          <p><strong>Status:</strong> {{ getStatus(maintenanceRequest.status) }}</p>
           <p><strong>Tenant:</strong> {{ maintenanceRequest.tenant_details.name }} ({{ maintenanceRequest.tenant_details.email }})</p>
           <p><strong>Property Address:</strong> {{ maintenanceRequest.property_details.address }}, {{ maintenanceRequest.property_details.city }}, {{ maintenanceRequest.property_details.postcode }}</p>
         </div>
