@@ -36,4 +36,19 @@ export class PropertyComponent implements OnInit {
       console.error('Property ID not found in route parameters');
     }
   }
+
+  deleteProperty() {
+    const propertyId = this.route.snapshot.paramMap.get('id');
+    if (propertyId) {
+      this.webService.deleteProperty(propertyId).subscribe(() => {
+        console.log("Property Deleted Successfully");
+        this.router.navigate(['/landlords/properties']);
+      }, (error) => {
+        console.error("Error deleting property", error);
+      });
+    } else {
+      console.error('Property ID not found in route parameters');
+    }
+  }
+
 }

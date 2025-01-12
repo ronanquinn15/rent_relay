@@ -176,30 +176,30 @@ def update_property_landlord(property_id):
 #
 #     return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id)}), 201)
 
-# @properties_bp.route('/api/properties/<property_id>', methods=['DELETE'])
-# @landlord_required
-# def delete_property(property_id):
-#     landlord_id = auto_populate_landlord_id()
-#     if not landlord_id:
-#         return make_response(jsonify({'error': 'Unauthorized'}), 401)
-#
-#     try:
-#         property_obj_id = ObjectId(property_id)
-#     except bson.errors.InvalidId:
-#         return make_response(jsonify({'error': 'Invalid property_id'}), 400)
-#
-#     property = properties.find_one({'_id': property_obj_id, 'landlord_id': landlord_id})
-#     if not property:
-#         return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
-#
-#     tenant_id = property.get('tenant_id')
-#     if tenant_id:
-#         tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': None}})
-#
-#     result = properties.delete_one({'_id': property_obj_id})
-#     if result.deleted_count == 1:
-#         return make_response(jsonify({'message': 'Property deleted'}), 200)
-#     return make_response(jsonify({'error': 'Property not found'}), 404)
+@properties_bp.route('/api/properties/<property_id>', methods=['DELETE'])
+@landlord_required
+def delete_property(property_id):
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    try:
+        property_obj_id = ObjectId(property_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid property_id'}), 400)
+
+    property = properties.find_one({'_id': property_obj_id, 'landlord_id': landlord_id})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
+
+    tenant_id = property.get('tenant_id')
+    if tenant_id:
+        tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': None}})
+
+    result = properties.delete_one({'_id': property_obj_id})
+    if result.deleted_count == 1:
+        return make_response(jsonify({'message': 'Property deleted'}), 200)
+    return make_response(jsonify({'error': 'Property not found'}), 404)
 
 @properties_bp.route('/api/tenants/property', methods=['GET'])
 @landlord_required
