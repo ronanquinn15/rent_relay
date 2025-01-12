@@ -139,42 +139,42 @@ def update_property_landlord(property_id):
 #     else:
 #         return make_response(jsonify({'error': 'Missing fields'}), 400)
 
-# @properties_bp.route('/api/properties', methods=['POST'])
-# @landlord_required
-# def add_property():
-#     fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'number_of_tenants', 'tenant_id']
-#     if not all(field in request.form for field in fields):
-#         return make_response(jsonify({"error": "Missing form data."}), 400)
-#
-#     landlord_id = auto_populate_landlord_id()
-#     if not landlord_id:
-#         return make_response(jsonify({'error': 'Landlord not found'}), 404)
-#
-#     tenant_id = request.form['tenant_id']
-#     tenant = tenants.find_one({'_id': ObjectId(tenant_id)})
-#     if not tenant:
-#         return make_response(jsonify({'error': 'Tenant not found'}), 404)
-#     if tenant['property_id']:
-#         return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
-#
-#     new_property = {
-#         'address': str(request.form['address']),
-#         'postcode': str(request.form['postcode']),
-#         'city': str(request.form['city']),
-#         'number_of_bedrooms': int(request.form['number_of_bedrooms']),
-#         'number_of_bathrooms': int(request.form['number_of_bathrooms']),
-#         'rent': int(request.form['rent']),
-#         'purchase_date': int(request.form['purchase_date']),
-#         'landlord_id': landlord_id,
-#         'number_of_tenants': int(request.form['number_of_tenants']),
-#         'tenant_id': ObjectId(tenant_id)
-#     }
-#     new_property_id = properties.insert_one(new_property).inserted_id
-#
-#     # Update tenant with property_id
-#     tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': new_property_id}})
-#
-#     return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id)}), 201)
+@properties_bp.route('/api/properties/add', methods=['POST'])
+@landlord_required
+def add_property():
+    fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'tenant_id']
+    if not all(field in request.form for field in fields):
+        return make_response(jsonify({"error": "Missing form data."}), 400)
+
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Landlord not found'}), 404)
+
+    tenant_id = request.form['tenant_id']
+    tenant = tenants.find_one({'_id': ObjectId(tenant_id)})
+    if not tenant:
+        return make_response(jsonify({'error': 'Tenant not found'}), 404)
+    if tenant['property_id']:
+        return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
+
+    new_property = {
+        'address': str(request.form['address']),
+        'postcode': str(request.form['postcode']),
+        'city': str(request.form['city']),
+        'number_of_bedrooms': int(request.form['number_of_bedrooms']),
+        'number_of_bathrooms': int(request.form['number_of_bathrooms']),
+        'rent': int(request.form['rent']),
+        'purchase_date': datetime.strptime(request.form['purchase_date'], '%Y-%m-%d').strftime('%Y/%m/%d'),
+        'landlord_id': landlord_id,
+        'number_of_tenants': 1,  # Set number_of_tenants to 1
+        'tenant_id': ObjectId(tenant_id)
+    }
+    new_property_id = properties.insert_one(new_property).inserted_id
+
+    # Update tenant with property_id
+    tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': new_property_id}})
+
+    return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id)}), 201)
 
 @properties_bp.route('/api/properties/<property_id>', methods=['DELETE'])
 @landlord_required
