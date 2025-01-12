@@ -25,7 +25,7 @@
       <h4 class="text-primary">Tenant Details</h4>
       <ul class="list-group">
         <li class="list-group-item" *ngFor="let tenant of property.tenant_details">
-          <p><i class="fas fa-id-badge"></i> <strong>Tenant ID:</strong> {{ tenant.tenant_id }}</p>
+          <p><i class="fas fa-id-badge"></i> <strong>Tenant ID:</strong> {{ property.tenant_id }}</p>
           <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenant.name }}</p>
           <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ tenant.email }}</p>
         </li>
