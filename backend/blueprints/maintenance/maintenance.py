@@ -70,7 +70,7 @@ def create_maintenance_request():
         'description': str(request.form['description']),
         'urgency': urgency,
         'request_date': datetime.datetime.now().strftime('%d-%m-%Y'),
-        'complete': False,
+        'status': False,
     }
     new_request_id = maintenance.insert_one(new_request)
     return make_response(jsonify({'message': 'Maintenance request created', 'request_id': str(new_request_id)}), 201)
@@ -83,19 +83,37 @@ def get_all_maintenance_requests():
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
     # Get all properties owned by landlord
-    properties_list = properties.find({'landlord_id': landlord_id}, {'_id': 1})
+    properties_list = properties.find({'landlord_id': landlord_id}, {'_id': 1, 'address': 1, 'city': 1, 'postcode': 1})
     property_ids = [prop['_id'] for prop in properties_list]
 
     if not property_ids:
         return make_response(jsonify({'error': 'No properties found for this landlord'}), 404)
 
     # Get all maintenance requests for properties owned by landlord
-    requests = maintenance.find({'property_id': {'$in': property_ids}, 'complete': False})
+    requests = maintenance.find({'property_id': {'$in': property_ids}, 'status': False})
     requests_list = []
     for request in requests:
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
         request['tenant_id'] = str(request['tenant_id'])
+
+        # Get tenant details
+        tenant = tenants.find_one({'_id': ObjectId(request['tenant_id'])}, {'name': 1, 'email': 1})
+        if tenant:
+            request['tenant_details'] = {
+                'name': tenant.get('name'),
+                'email': tenant.get('email')
+            }
+
+        # Get property details
+        property = properties.find_one({'_id': ObjectId(request['property_id'])}, {'address': 1, 'city': 1, 'postcode': 1})
+        if property:
+            request['property_details'] = {
+                'address': property.get('address'),
+                'city': property.get('city'),
+                'postcode': property.get('postcode')
+            }
+
         requests_list.append(request)
 
     if not requests_list:
@@ -122,9 +140,9 @@ def get_all_requests_based_off_tenant():
         return make_response(jsonify({'error': 'No maintenance requests found for this tenant'}), 404)
     return make_response(jsonify(requests_list), 200)
 
-@maintenance_bp.route('/api/maintenance/received/<request_id>', methods=['GET'])
+@maintenance_bp.route('/api/maintenance/details/<request_id>', methods=['GET'])
 @landlord_required
-def get_maintenance_request_landlord(request_id):
+def get_maintenance_request_with_details(request_id):
     landlord_id = auto_populate_landlord_id()
     if not landlord_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
@@ -146,6 +164,25 @@ def get_maintenance_request_landlord(request_id):
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
         request['tenant_id'] = str(request['tenant_id'])
+
+        # Get tenant details
+        tenant = tenants.find_one({'_id': ObjectId(request['tenant_id'])}, {'name': 1, 'email': 1, 'username': 1})
+        if tenant:
+            request['tenant_details'] = {
+                'name': tenant.get('name'),
+                'email': tenant.get('email'),
+                'username': tenant.get('username')
+            }
+
+        # Get property details
+        property = properties.find_one({'_id': ObjectId(request['property_id'])}, {'address': 1, 'city': 1, 'postcode': 1})
+        if property:
+            request['property_details'] = {
+                'address': property.get('address'),
+                'city': property.get('city'),
+                'postcode': property.get('postcode')
+            }
+
         return make_response(jsonify(request), 200)
     else:
         return make_response(jsonify({'error': 'Maintenance request not found'}), 404)
@@ -180,14 +217,14 @@ def update_maintenance_request(request_id):
     except bson.errors.InvalidId:
         return make_response(jsonify({'error': 'Invalid request_id'}), 400)
 
-    fields = ['complete']
+    fields = ['status']
     updated_information = {}
     if not any(field in request.form for field in fields):
         return make_response(jsonify({'error': 'No fields to update'}), 400)
 
     for field in fields:
         if field in request.form:
-            if field == 'complete':
+            if field == 'status':
                 if request.form[field] == 'true':
                     updated_information[f'{field}'] = True
                 elif request.form[field] == 'false':

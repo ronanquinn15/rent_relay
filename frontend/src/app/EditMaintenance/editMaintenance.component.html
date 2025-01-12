@@ -1,0 +1,27 @@
+<div class="container" style="margin-top: 70px" *ngIf="maintenanceRequest">
+  <div class="row">
+    <div class="col-sm-12">
+      <h2 class="text-center mb-4">Maintenance Request Details</h2>
+      <div class="card mb-3 custom-hover shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Request ID: {{ maintenanceRequest._id }}</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Description:</strong> {{ maintenanceRequest.description }}</p>
+          <p><strong>Request Date:</strong> {{ maintenanceRequest.request_date }}</p>
+          <p><strong>Urgency:</strong> {{ maintenanceRequest.urgency }}</p>
+          <p><strong>Status:</strong> {{ maintenanceRequest.status ? 'Complete' : 'Incomplete' }}</p>
+          <p><strong>Tenant:</strong> {{ maintenanceRequest.tenant_details.name }} ({{ maintenanceRequest.tenant_details.email }})</p>
+          <p><strong>Property Address:</strong> {{ maintenanceRequest.property_details.address }}, {{ maintenanceRequest.property_details.city }}, {{ maintenanceRequest.property_details.postcode }}</p>
+        </div>
+      </div>
+      <form [formGroup]="maintenanceForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="status">Status</label>
+          <input type="checkbox" id="status" formControlName="status">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Status</button>
+      </form>
+    </div>
+  </div>
+</div>

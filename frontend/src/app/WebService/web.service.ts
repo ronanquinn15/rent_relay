@@ -113,4 +113,24 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  getOneMaintenanceRequest(maintenanceId: string): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/maintenance/details/' + maintenanceId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, {headers});
+  }
+
+  updateMaintenanceRequest(maintenanceId: string, maintenance: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('status', maintenance.status);
+    const url = 'http://127.0.0.1:5000/api/maintenance/' + maintenanceId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.put(url, postData, { headers });
+  }
+
 }
