@@ -1,0 +1,38 @@
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h2>{{ property.name }}</h2>
+      <span class="badge badge-light">Property ID: {{ property._id }}</span>
+    </div>
+    <div class="card-body">
+      <h4 class="text-primary">Property Details</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> {{ property.address }}</p>
+          <p><i class="fas fa-city"></i> <strong>City:</strong> {{ property.city }}</p>
+          <p><i class="fas fa-mail-bulk"></i> <strong>Postcode:</strong> {{ property.postcode }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><i class="fas fa-bed"></i> <strong>Number of Bedrooms:</strong> {{ property.number_of_bedrooms }}</p>
+          <p><i class="fas fa-bath"></i> <strong>Number of Bathrooms:</strong> {{ property.number_of_bathrooms }}</p>
+          <p><i class="fas fa-pound-sign"></i> <strong>Rent:</strong> £{{ property.rent }}</p>
+        </div>
+      </div>
+      <p><i class="fas fa-calendar-alt"></i> <strong>Purchase Date:</strong> {{ property.purchase_date | date }}</p>
+      <p><i class="fas fa-users"></i> <strong>Number of Tenants:</strong> {{ property.number_of_tenants }}</p>
+    </div>
+    <div class="card-body">
+      <h4 class="text-primary">Tenant Details</h4>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let tenant of property.tenant_details">
+          <p><i class="fas fa-id-badge"></i> <strong>Tenant ID:</strong> {{ tenant.tenant_id }}</p>
+          <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenant.name }}</p>
+          <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ tenant.email }}</p>
+        </li>
+      </ul>
+    </div>
+    <div class="card-footer text-muted">
+      <p><i class="fas fa-clock"></i> Last updated: {{ property.last_updated | date:'short' }}</p>
+    </div>
+  </div>
+</div>

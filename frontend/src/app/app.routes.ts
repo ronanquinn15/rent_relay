@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './Home/home.component';
 import { UserAuthComponent } from './UserAuthentication/userAuth.component';
 import { MaintenanceComponent } from './Maintenance/maintenance.component';
-import { PropertyComponent } from './Properties/property.component';
+import { PropertiesComponent } from './Properties/properties.component';
+import {PropertyComponent} from './Property/property.component';
 
 export const routes: Routes = [
   {
@@ -15,6 +16,10 @@ export const routes: Routes = [
   },
   {
     path: 'landlords/properties',
+    component: PropertiesComponent
+  },
+  {
+    path: 'landlords/properties/:id',
     component: PropertyComponent
   },
   {
