@@ -21,6 +21,35 @@ def auto_populate_landlord_id():
             return None
     return None
 
+def auto_populate_tenant_id():
+    token = request.headers.get('x-access-token')
+    if token:
+        try:
+            data = jwt.decode(token, globals.secret_key, algorithms='HS256')
+            if data['role'] == 'tenant':
+                return ObjectId(data['user_id'])
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+    return None
+
+@tenants_bp.route('/api/tenant/info', methods=['GET'])
+@tenant_required
+def get_tenant_info():
+    tenant_id = auto_populate_tenant_id()
+    if not tenant_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    tenant = tenants.find_one({'_id': tenant_id}, {'password': 0})
+    if tenant:
+        tenant['_id'] = str(tenant['_id'])
+        tenant['property_id'] = str(tenant['property_id']) if tenant.get('property_id') else None
+        return make_response(jsonify(tenant), 200)
+    else:
+        return make_response(jsonify({'error': 'Tenant not found'}), 404)
+
+
 @tenants_bp.route('/api/tenants', methods=['GET'])
 @admin_required
 def get_all_tenants():

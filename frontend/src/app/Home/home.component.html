@@ -10,15 +10,15 @@
 </div>
 
 <div *ngIf="userRole === 'tenant'" class="container" style="margin-top: 70px">
-  <h1>Welcome, {{ tenantProperty.tenant_details?.name }}!</h1>
+  <h1>Welcome, {{ tenantInfo.name }}!</h1>
   <div class="row">
     <div class="col-md-6">
       <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h2 class="card-title">Property Details</h2>
-          <span class="badge badge-light">Property ID: {{ tenantProperty._id }}</span>
+          <span class="badge badge-light" *ngIf="tenantProperty._id">Property ID: {{ tenantProperty._id }}</span>
         </div>
-        <div class="card-body">
+        <div class="card-body" *ngIf="tenantProperty._id; else noProperty">
           <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> {{ tenantProperty.address }}</p>
           <p><i class="fas fa-city"></i> <strong>City:</strong> {{ tenantProperty.city }}</p>
           <p><i class="fas fa-mail-bulk"></i> <strong>Postcode:</strong> {{ tenantProperty.postcode }}</p>
@@ -26,29 +26,41 @@
           <p><i class="fas fa-bath"></i> <strong>Number of Bathrooms:</strong> {{ tenantProperty.number_of_bathrooms }}</p>
           <p><i class="fas fa-pound-sign"></i> <strong>Rent:</strong> £{{ tenantProperty.rent }}</p>
         </div>
+        <ng-template #noProperty>
+          <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>You currently don't have a property assigned.</div>
+          </div>
+        </ng-template>
       </div>
     </div>
     <div class="col-md-6">
       <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h2 class="card-title">Landlord Information</h2>
-          <span class="badge badge-light">Landlord ID: {{ tenantProperty.landlord_id }}</span>
+          <span class="badge badge-light" *ngIf="tenantProperty.landlord_id">Landlord ID: {{ tenantProperty.landlord_id }}</span>
         </div>
-        <div class="card-body">
+        <div class="card-body" *ngIf="tenantProperty.landlord_details; else noLandlord">
           <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenantProperty.landlord_details?.name }}</p>
           <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ tenantProperty.landlord_details?.email }}</p>
           <p><i class="fas fa-phone"></i> <strong>Username:</strong> {{ tenantProperty.landlord_details?.username }}</p>
         </div>
+        <ng-template #noLandlord>
+          <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>No landlord information to show.</div>
+          </div>
+        </ng-template>
       </div>
       <div class="card shadow-lg mt-3">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h2 class="card-title">Tenant Information</h2>
-          <span class="badge badge-light">Tenant ID: {{ tenantProperty.tenant_id }}</span>
+          <span class="badge badge-light">Tenant ID: {{ tenantInfo._id }}</span>
         </div>
         <div class="card-body">
-          <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenantProperty.tenant_details?.name }} ({{ tenantProperty.tenant_details?.username }})</p>
-          <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ tenantProperty.tenant_details?.email }}</p>
-          <p><i class="fas fa-user"></i> <strong>Username:</strong> {{ tenantProperty.tenant_details?.username }}</p>
+          <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenantInfo?.name }}</p>
+          <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ tenantInfo?.email }}</p>
+          <p><i class="fas fa-user"></i> <strong>Username:</strong> {{ tenantInfo?.username }}</p>
           <button class="btn btn-primary" (click)="editTenant()">Edit Information</button>
         </div>
       </div>
