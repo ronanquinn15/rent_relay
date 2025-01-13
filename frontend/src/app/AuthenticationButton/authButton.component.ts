@@ -34,7 +34,7 @@ export class AuthButtonComponent {
     this.webService.getLogout().subscribe(
       resp => {
         this.authService.logout();
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
         this.authStatusChanged.emit();
         console.log('Logged out');
       },

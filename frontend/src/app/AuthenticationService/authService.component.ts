@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
+import { Router } from '@angular/router';
 
 interface DecodedToken extends JwtPayload {
   role: string;
@@ -11,7 +12,7 @@ interface DecodedToken extends JwtPayload {
 
 export class AuthService {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   getUserRole(): string {
     const token = sessionStorage.getItem('token');
@@ -27,8 +28,10 @@ export class AuthService {
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('userRole');
+    sessionStorage.clear()
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload();
+    });
   }
 
   login(token: string) {

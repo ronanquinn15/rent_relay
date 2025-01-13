@@ -6,7 +6,7 @@ import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-community';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../AuthenticationService/authService.component';
-import {NgIf} from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'home',
@@ -15,6 +15,7 @@ import {NgIf} from '@angular/common';
   standalone: true,
   imports: [AgGridAngular, AgCharts, FormsModule, NgIf]
 })
+
 export class HomeComponent implements OnInit {
   userRole: string = '';
   data: any[] = [];
