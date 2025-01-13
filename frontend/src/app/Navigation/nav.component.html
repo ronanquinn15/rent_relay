@@ -2,7 +2,7 @@
   <span class="navbar-brand">
     <a class="nav-link" [routerLink]="['/']">Rent Relay</a>
   </span>
-  <ul class="navbar-nav">
+  <ul class="navbar-nav" *ngIf="userRole === 'landlord' || userRole === 'tenant'">
     <li class="nav-item">
       <a class="nav-link" [routerLink]="['/']">Home</a>
     </li>
@@ -12,7 +12,7 @@
     <li class="nav-item" *ngIf="userRole === 'landlord'">
       <a class="nav-link" [routerLink]="['/landlords/properties/add']">Add Property</a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item" *ngIf="userRole === 'landlord' || userRole === 'tenant'">
       <a class="nav-link" [routerLink]="['/maintenance']">Maintenance</a>
     </li>
   </ul>
