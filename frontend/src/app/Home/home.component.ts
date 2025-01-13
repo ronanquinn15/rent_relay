@@ -1,21 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
 import { WebService } from '../WebService/web.service';
 import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-community';
 import { FormsModule } from '@angular/forms';
-
+import { AuthService } from '../AuthenticationService/authService.component';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [AgGridAngular, AgCharts, FormsModule]
+  imports: [AgGridAngular, AgCharts, FormsModule, NgIf]
 })
-
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  userRole: string = '';
+  data: any[] = [];
 
   headings: ColDef[] = [
     { field: "address" },
@@ -28,8 +30,6 @@ export class HomeComponent {
     { field: "rent" },
   ];
 
-  data: any = [];
-
   gridOptions = {
     columnDefs: this.headings,
     rowData: this.data,
@@ -40,13 +40,18 @@ export class HomeComponent {
     domLayout: 'autoHeight' as 'autoHeight',
   };
 
-  constructor(private webService: WebService) { }
+  constructor(private webService: WebService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.webService.getProperties().subscribe((resp) => {
-        this.data = resp;
-    });
+    this.userRole = this.authService.getUserRole();
+    if (this.userRole === 'landlord') {
+      this.loadProperties();
+    }
   }
 
-
+  loadProperties(): void {
+    this.webService.getProperties().subscribe((resp) => {
+      this.data = resp;
+    });
+  }
 }

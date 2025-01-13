@@ -1,10 +1,12 @@
-<h1 style="margin-top: 70px">
+<div *ngIf="userRole === 'landlord'">
+  <h1 style="margin-top: 70px">
   Overview of all your Registered Properties
 </h1>
-<ag-grid-angular
-  class="ag-theme-alpine"
-  style="width: 100%"
-  [rowData]="data"
-  [columnDefs]="headings"
-  [gridOptions]="gridOptions">
-</ag-grid-angular>
+  <ag-grid-angular
+    class="ag-theme-alpine"
+    style="width: 100%"
+    [rowData]="data"
+    [columnDefs]="headings"
+    [gridOptions]="gridOptions">
+  </ag-grid-angular>
+</div>
