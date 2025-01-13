@@ -8,11 +8,14 @@ export class WebService {
 
   constructor(private http: HttpClient) { }
 
+  // Login endpoint which sends a GET request to the server
   getLogin(username: string, password: string): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/login';
+    // Basic authentication
     const headers = new HttpHeaders({
       'Authorization': 'Basic ' + btoa(username + ':' + password)
     });
+    // Return the token from the server
     return this.http.get(url, { headers }).pipe(
       tap((response: any) => {
         if (response.token) {
@@ -22,16 +25,19 @@ export class WebService {
     );
   }
 
+  // Logout endpoint which sends a GET request to the server
   getLogout(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/logout';
     const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'x-access-token': token || ''
     });
+    // Return the response from the server
     return this.http.get(url, { headers });
   }
 
-  // Used for AG-Grid
+  // GET all properties uploaded by a landlord - Used for AG-Grid
+  // Landlord endpoint
   getProperties(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/properties';
     const token = sessionStorage.getItem('token');
@@ -41,6 +47,8 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // GET all properties details uploaded by a landlord
+  // Landlord endpoint
   getPropertyWithTenants(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/tenants/property';
     const token = sessionStorage.getItem('token');
@@ -50,6 +58,8 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // GET one property uploaded by a landlord
+  // Landlord endpoint
   getOneProperty(propertyId: string): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/tenants/property/' + propertyId;
     const token = sessionStorage.getItem('token');
@@ -59,6 +69,8 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // POST a new property uploaded by a landlord
+  // Landlord endpoint
   addProperty(property: any): Observable<any> {
     let postData = new FormData();
     postData.append('address', property.address);
@@ -77,6 +89,8 @@ export class WebService {
     return this.http.post(url, postData, { headers });
   }
 
+  // PUT an updated property uploaded by a landlord
+  // Landlord endpoint
   updateProperty(propertyId: string, property: any): Observable<any> {
     let postData = new FormData();
     postData.append('address', property.address);
@@ -95,6 +109,8 @@ export class WebService {
     return this.http.put(url, postData, { headers });
   }
 
+  // DELETE a property uploaded by a landlord
+  // Landlord endpoint
   deleteProperty(propertyId: string): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/properties/' + propertyId;
     const token = sessionStorage.getItem('token');
@@ -104,6 +120,8 @@ export class WebService {
     return this.http.delete(url, { headers });
   }
 
+  // GET all maintenance requests assigned to a property related to landlord
+  // Landlord endpoint
   getMaintenanceRequests(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/maintenance';
     const token = sessionStorage.getItem('token');
@@ -113,6 +131,8 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // GET one maintenance requests assigned to a property related to landlord
+  // Landlord endpoint
   getOneMaintenanceRequest(maintenanceId: string): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/maintenance/details/' + maintenanceId;
     const token = sessionStorage.getItem('token');
@@ -122,6 +142,8 @@ export class WebService {
     return this.http.get(url, {headers});
   }
 
+  // PUT an updated maintenance request assigned to a property related to landlord
+  // Landlord endpoint
   updateMaintenanceRequest(maintenanceId: string, maintenance: any): Observable<any> {
     let postData = new FormData();
     postData.append('status', maintenance.status);
