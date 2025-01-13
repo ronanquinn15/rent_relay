@@ -43,4 +43,27 @@ export class MaintenanceViewComponent implements OnInit {
       this.router.navigate([`/maintenance/${this.maintenanceRequest._id}/edit`]);
     }
   }
+
+  deleteMaintenanceRequest(): void {
+    const requestId = this.route.snapshot.paramMap.get('id');
+    if (requestId) {
+      this.webService.deleteMaintenanceRequest(requestId).subscribe(() => {
+        console.log('Maintenance Request Deleted Successfully');
+        this.router.navigate(['/maintenance']);
+      }, (error) => {
+        console.error('Error deleting maintenance request', error);
+      });
+    } else {
+      console.error('Maintenance Request ID not found in route parameters');
+    }
+  }
+
+  trackById(index: number, request: any): string {
+    return request._id;
+  }
+
+  getStatus(status: boolean): string {
+    return status ? 'Complete' : 'Pending';
+  }
+
 }

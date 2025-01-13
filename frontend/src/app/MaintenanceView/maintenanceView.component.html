@@ -36,7 +36,7 @@
           <div class="col-md-6">
             <p><i class="fas fa-calendar-alt"></i> <strong>Request Date:</strong> {{ maintenanceRequest.request_date }}</p>
             <p><i class="fas fa-exclamation-triangle"></i> <strong>Urgency:</strong> {{ maintenanceRequest.urgency }}</p>
-            <p><i class="fas fa-info-circle"></i> <strong>Status:</strong> {{ maintenanceRequest.complete ? 'Complete' : 'Incomplete' }}</p>
+            <p><i class="fas fa-info-circle"></i> <strong>Status:</strong> {{ getStatus(maintenanceRequest.status) }}</p>
           </div>
           <div class="col-md-6">
             <p><i class="fas fa-map-marker-alt"></i> <strong>Property Address:</strong> {{ maintenanceRequest.property_details.address }}, {{ maintenanceRequest.property_details.city }}, {{ maintenanceRequest.property_details.postcode }}</p>
@@ -44,9 +44,9 @@
         </div>
         <p><i class="fas fa-align-left"></i> <strong>Description:</strong> {{ maintenanceRequest.description }}</p>
       </div>
-      <!--<div class="card-footer text-muted d-flex justify-content-between">
-        <button class="btn btn-danger" (click)="">Delete</button>
-      </div>-->
+      <div class="card-footer text-muted d-flex justify-content-end">
+        <button class="btn btn-danger" (click)="deleteMaintenanceRequest()">Delete</button>
+      </div>
     </div>
   </div>
 </div>

@@ -199,4 +199,15 @@ export class WebService {
     return this.http.get(url, {headers});
   }
 
+  // DELETE a maintenance request assigned to a property related to tenant
+  // Tenant endpoint
+  deleteMaintenanceRequest(maintenanceId: string): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/maintenance/' + maintenanceId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.delete(url, {headers});
+  }
+
 }
