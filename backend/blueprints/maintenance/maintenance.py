@@ -134,6 +134,16 @@ def get_all_requests_based_off_tenant():
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
         request['tenant_id'] = str(request['tenant_id'])
+
+        # Get property details
+        property = properties.find_one({'_id': ObjectId(request['property_id'])}, {'address': 1, 'city': 1, 'postcode': 1})
+        if property:
+            request['property_details'] = {
+                'address': property.get('address'),
+                'city': property.get('city'),
+                'postcode': property.get('postcode')
+            }
+
         requests_list.append(request)
 
     if not requests_list:

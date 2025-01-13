@@ -166,4 +166,15 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // GET all maintenance requests assigned to a property related to tenant
+  // Tenant endpoint
+  getMaintenanceRequestsRelatedToTenant(): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/maintenance/submitted';
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, { headers });
+  }
+
 }

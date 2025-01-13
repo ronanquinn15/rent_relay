@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { WebService } from '../WebService/web.service';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import {AsyncPipe, CommonModule} from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { AuthService } from '../AuthenticationService/authService.component';
 
 @Component({
   selector: 'maintenance',
@@ -12,18 +13,30 @@ import {AsyncPipe, CommonModule} from '@angular/common';
   providers: [WebService]
 })
 
-export class MaintenanceComponent {
+export class MaintenanceComponent implements OnInit {
   maintenanceRequests: any = [];
+  userRole: string = '';
 
-  constructor(private webService: WebService) { }
+  constructor(private webService: WebService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.webService.getMaintenanceRequests().subscribe((resp) => {
+    this.userRole = this.authService.getUserRole();
+    if (this.userRole === 'landlord') {
+      this.webService.getMaintenanceRequests().subscribe((resp) => {
         this.maintenanceRequests = resp;
-    });
+      });
+    } else if (this.userRole === 'tenant') {
+      this.webService.getMaintenanceRequestsRelatedToTenant().subscribe((resp) => {
+        this.maintenanceRequests = resp;
+      });
+    }
   }
 
   trackById(index: number, request: any): string {
     return request._id;
+  }
+
+  getStatus(status: boolean): string {
+    return status ? 'Complete' : 'Pending';
   }
 }

@@ -2,19 +2,37 @@
   <div class="row">
     <div class="col-sm-12">
       <h2 class="text-center mb-4">Maintenance Requests</h2>
-      <div *ngFor="let request of maintenanceRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Request ID: {{ request._id }}</h5>
+      <div *ngIf="userRole === 'landlord'">
+        <div *ngFor="let request of maintenanceRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Request ID: {{ request._id }}</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Request Date:</strong> {{ request.request_date }}</p>
+            <p><strong>Urgency:</strong> {{ request.urgency }}</p>
+            <p><strong>Status:</strong> {{ getStatus(request.status) }}</p>
+            <p><strong>Tenant:</strong> {{ request.tenant_details.name }}</p>
+            <p><strong>Property Address:</strong> {{ request.property_details.address }}, {{ request.property_details.city }}, {{ request.property_details.postcode }}</p>
+          </div>
+          <div class="card-footer text-right">
+            <button class="btn btn-info" [routerLink]="['/maintenance', request._id]">View Details</button>
+          </div>
         </div>
-        <div class="card-body">
-          <p><strong>Request Date:</strong> {{ request.request_date }}</p>
-          <p><strong>Urgency:</strong> {{ request.urgency }}</p>
-          <p><strong>Status:</strong> {{ request.complete ? 'Complete' : 'Incomplete' }}</p>
-          <p><strong>Tenant:</strong> {{ request.tenant_details.name }}</p>
-          <p><strong>Property Address:</strong> {{ request.property_details.address }}, {{ request.property_details.city }}, {{ request.property_details.postcode }}</p>
-        </div>
-        <div class="card-footer text-right">
-          <button class="btn btn-info" [routerLink]="['/maintenance', request._id]">View Details</button>
+      </div>
+      <div *ngIf="userRole === 'tenant'">
+        <div *ngFor="let request of maintenanceRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Request ID: {{ request._id }}</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Request Date:</strong> {{ request.request_date }}</p>
+            <p><strong>Urgency:</strong> {{ request.urgency }}</p>
+            <p><strong>Status:</strong> {{ getStatus(request.status) }}</p>
+            <p><strong>Property Address:</strong> {{ request.property_details.address }}, {{ request.property_details.city }}, {{ request.property_details.postcode }}</p>
+          </div>
+          <div class="card-footer text-right">
+            <button class="btn btn-info" [routerLink]="['/maintenance', request._id]">View Details</button>
+          </div>
         </div>
       </div>
     </div>
