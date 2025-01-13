@@ -43,7 +43,7 @@ def auto_populate_property_id():
             return tenant['property_id']
     return None
 
-@maintenance_bp.route('/api/maintenance', methods=['POST'])
+@maintenance_bp.route('/api/maintenance/submit', methods=['POST'])
 @tenant_required
 def create_maintenance_request():
     fields = ['description', 'urgency']

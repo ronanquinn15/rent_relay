@@ -8,6 +8,7 @@ import { EditPropertyComponent } from './EditProperty/editProperty.component';
 import { AddPropertyComponent } from './AddProperty/addProperty.component';
 import { MaintenanceViewComponent } from './MaintenanceView/maintenanceView.component';
 import { EditMaintenanceComponent } from './EditMaintenance/editMaintenance.component';
+import { AddMaintenanceFormComponent } from './AddMaintenanceForm/addMaintenanceForm.component';
 
 export const routes: Routes = [
   {
@@ -37,6 +38,10 @@ export const routes: Routes = [
   {
     path: 'maintenance',
     component: MaintenanceComponent
+  },
+  {
+    path: 'maintenance/add',
+    component: AddMaintenanceFormComponent
   },
   {
     path: 'maintenance/:id',

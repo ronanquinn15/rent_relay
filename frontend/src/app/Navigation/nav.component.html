@@ -15,6 +15,9 @@
     <li class="nav-item" *ngIf="userRole === 'landlord' || userRole === 'tenant'">
       <a class="nav-link" [routerLink]="['/maintenance']">Maintenance</a>
     </li>
+    <li class="nav-item" *ngIf="userRole === 'tenant'">
+      <a class="nav-link" [routerLink]="['/maintenance/add']">Request Maintenance</a>
+    </li>
   </ul>
   <div class="form-inline ms-auto" style="margin-right: 10px">
     <auth-button (authStatusChanged)="updateAuthStatus()"></auth-button>

@@ -199,6 +199,20 @@ export class WebService {
     return this.http.get(url, {headers});
   }
 
+  // POST a new maintenance request assigned to a property related to tenant
+  // Tenant endpoint
+  addMaintenanceRequest(maintenance: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('urgency', maintenance.urgency);
+    postData.append('description', maintenance.description);
+    const url = 'http://127.0.0.1:5000/api/maintenance/submit';
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.post(url, postData, {headers});
+  }
+
   // DELETE a maintenance request assigned to a property related to tenant
   // Tenant endpoint
   deleteMaintenanceRequest(maintenanceId: string): Observable<any> {
