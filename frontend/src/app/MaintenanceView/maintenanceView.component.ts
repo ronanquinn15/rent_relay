@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebService } from '../WebService/web.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../AuthenticationService/authService.component';
 
 @Component({
   selector: 'app-maintenance-view',
@@ -11,17 +12,29 @@ import { CommonModule } from '@angular/common';
   providers: [WebService],
   imports: [CommonModule]
 })
+
 export class MaintenanceViewComponent implements OnInit {
   maintenanceRequest: any;
+  userRole: string = '';
 
-  constructor(private webService: WebService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private webService: WebService,
+              private route: ActivatedRoute,
+              private router: Router,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.userRole = this.authService.getUserRole();
     const requestId = this.route.snapshot.paramMap.get('id');
     if (requestId) {
-      this.webService.getOneMaintenanceRequest(requestId).subscribe((data) => {
-        this.maintenanceRequest = data;
-      });
+      if (this.userRole === 'landlord') {
+        this.webService.getOneMaintenanceRequest(requestId).subscribe((data) => {
+          this.maintenanceRequest = data;
+        });
+      } else if (this.userRole === 'tenant') {
+        this.webService.getOneMaintenanceRequestRelatedToTenant(requestId).subscribe((data) => {
+          this.maintenanceRequest = data;
+        });
+      }
     }
   }
 
@@ -30,5 +43,4 @@ export class MaintenanceViewComponent implements OnInit {
       this.router.navigate([`/maintenance/${this.maintenanceRequest._id}/edit`]);
     }
   }
-
 }

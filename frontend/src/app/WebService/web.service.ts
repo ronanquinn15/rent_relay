@@ -155,8 +155,8 @@ export class WebService {
     return this.http.put(url, postData, { headers });
   }
 
-  // Add a new method in `web.service.ts` to fetch tenant information
-
+  // GET tenant details based on logged in user
+  // Tenant endpoint
   getTenantInfo(): Observable<any> {
     const url = 'http://127.0.0.1:5000/api/tenant/info';
     const token = sessionStorage.getItem('token');
@@ -186,6 +186,17 @@ export class WebService {
       'x-access-token': token || ''
     });
     return this.http.get(url, { headers });
+  }
+
+  // GET one maintenance request assigned to a property related to tenant
+  // Tenant endpoint
+  getOneMaintenanceRequestRelatedToTenant(maintenanceId: string): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/maintenance/submitted/' + maintenanceId;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, {headers});
   }
 
 }

@@ -215,6 +215,16 @@ def get_maintenance_request_tenant(request_id):
         request['_id'] = str(request['_id'])
         request['property_id'] = str(request['property_id'])
         request['tenant_id'] = str(request['tenant_id'])
+
+        # Get property details
+        property = properties.find_one({'_id': ObjectId(request['property_id'])}, {'address': 1, 'city': 1, 'postcode': 1, 'landlord_id': 1})
+        if property:
+            request['property_details'] = {
+                'address': property.get('address'),
+                'city': property.get('city'),
+                'postcode': property.get('postcode')
+            }
+
         return make_response(jsonify(request), 200)
     else:
         return make_response(jsonify({'error': 'Maintenance request not found'}), 404)
