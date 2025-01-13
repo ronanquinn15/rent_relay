@@ -18,6 +18,7 @@ import {NgIf} from '@angular/common';
 export class HomeComponent implements OnInit {
   userRole: string = '';
   data: any[] = [];
+  tenantProperty: any = {};
 
   headings: ColDef[] = [
     { field: "address" },
@@ -46,6 +47,8 @@ export class HomeComponent implements OnInit {
     this.userRole = this.authService.getUserRole();
     if (this.userRole === 'landlord') {
       this.loadProperties();
+    } else if (this.userRole === 'tenant') {
+      this.loadTenantProperty();
     }
   }
 
@@ -54,4 +57,15 @@ export class HomeComponent implements OnInit {
       this.data = resp;
     });
   }
+
+  loadTenantProperty(): void {
+    this.webService.getPropertyRelatedToTenant().subscribe((resp) => {
+      this.tenantProperty = resp;
+    });
+  }
+
+  editTenant(): void {
+    console.log("Edit Tenant Btn Clicked");
+  }
+
 }

@@ -155,4 +155,15 @@ export class WebService {
     return this.http.put(url, postData, { headers });
   }
 
+  // GET property and landlord details related to Tenant ID
+  // Tenant endpoint
+  getPropertyRelatedToTenant(): Observable<any> {
+    const url = 'http://127.0.0.1:5000/api/tenant/property/details';
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, { headers });
+  }
+
 }
