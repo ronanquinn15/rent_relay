@@ -2,6 +2,14 @@
   margin-top: 20px;
 }
 
+.card-header {
+  font-size: 1.25rem;
+}
+
+.card-body p {
+  margin-bottom: 10px;
+}
+
 .alert {
   margin-top: 20px;
   display: flex;
