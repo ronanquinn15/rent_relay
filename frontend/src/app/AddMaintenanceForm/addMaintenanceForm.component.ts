@@ -26,6 +26,10 @@ export class AddMaintenanceFormComponent {
     });
   }
 
+  setUrgency(value: string) {
+    this.maintenanceForm.get('urgency')?.setValue(value);
+  }
+
   onSubmit() {
     if (this.maintenanceForm.valid) {
       this.webService.addMaintenanceRequest(this.maintenanceForm.value).subscribe(response => {

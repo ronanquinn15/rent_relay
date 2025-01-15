@@ -1,0 +1,8 @@
+.btn-group-toggle .btn {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-group-toggle .btn.active {
+  background-color: #007bff;
+  color: white;
+}
