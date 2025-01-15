@@ -1,43 +1,52 @@
-<div class="container" style="margin-top: 80px">
+<div class="container" style="margin-top: 70px">
   <div class="card shadow-lg">
     <div class="card-header bg-primary text-white">
-      <h2>Add New Property</h2>
+      <h2 class="mb-0">Add New Property</h2>
     </div>
     <div class="card-body">
       <form [formGroup]="addPropertyForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input id="address" formControlName="address" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="city">City</label>
-          <input id="city" formControlName="city" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="postcode">Postcode</label>
-          <input id="postcode" formControlName="postcode" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="number_of_bedrooms">Number of Bedrooms</label>
-          <input id="number_of_bedrooms" formControlName="number_of_bedrooms" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="number_of_bathrooms">Number of Bathrooms</label>
-          <input id="number_of_bathrooms" formControlName="number_of_bathrooms" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="rent">Rent</label>
-          <input id="rent" formControlName="rent" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label for="purchase_date">Purchase Date</label>
-          <input id="purchase_date" formControlName="purchase_date" class="form-control" type="date" />
-        </div>
-        <div class="form-group" style="margin-bottom: 10px">
-          <label for="tenant_id">Tenant ID</label>
-          <input id="tenant_id" formControlName="tenant_id" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Add Property</button>
+        <fieldset class="form-group mb-3">
+          <legend>Property Details</legend>
+          <div class="form-group mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input id="address" formControlName="address" class="form-control" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="city" class="form-label">City</label>
+            <input id="city" formControlName="city" class="form-control" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="postcode" class="form-label">Postcode</label>
+            <input id="postcode" formControlName="postcode" class="form-control" />
+          </div>
+        </fieldset>
+        <fieldset class="form-group mb-3">
+          <legend>Property Features</legend>
+          <div class="form-group mb-3">
+            <label for="number_of_bedrooms" class="form-label">Number of Bedrooms</label>
+            <input id="number_of_bedrooms" formControlName="number_of_bedrooms" class="form-control" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="number_of_bathrooms" class="form-label">Number of Bathrooms</label>
+            <input id="number_of_bathrooms" formControlName="number_of_bathrooms" class="form-control" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="rent" class="form-label">Rent</label>
+            <input id="rent" formControlName="rent" class="form-control" />
+          </div>
+        </fieldset>
+        <fieldset class="form-group mb-3">
+          <legend>Additional Information</legend>
+          <div class="form-group mb-3">
+            <label for="purchase_date" class="form-label">Purchase Date</label>
+            <input id="purchase_date" formControlName="purchase_date" class="form-control" type="date" />
+          </div>
+          <div class="form-group mb-4">
+            <label for="tenant_id" class="form-label">Tenant ID</label>
+            <input id="tenant_id" formControlName="tenant_id" class="form-control" />
+          </div>
+        </fieldset>
+        <button type="submit" class="btn btn-primary w-100">Add Property</button>
       </form>
     </div>
   </div>
