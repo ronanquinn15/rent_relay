@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebService } from '../WebService/web.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -25,7 +25,7 @@ export class EditMaintenanceComponent implements OnInit {
     private router: Router
   ) {
     this.maintenanceForm = this.fb.group({
-      status: [false]
+      status: [false, Validators.requiredTrue]
     });
   }
 
@@ -44,12 +44,14 @@ export class EditMaintenanceComponent implements OnInit {
   }
 
   onSubmit(): void {
-  const updatedRequest = {
-    ...this.maintenanceRequest,
-    status: this.maintenanceForm.value.status
-  };
-  this.webService.updateMaintenanceRequest(this.maintenanceId, updatedRequest).subscribe(() => {
-    this.router.navigate(['/maintenance']);
-  });
-}
+    if (this.maintenanceForm.valid) {
+      const updatedRequest = {
+        ...this.maintenanceRequest,
+        status: this.maintenanceForm.value.status
+      };
+      this.webService.updateMaintenanceRequest(this.maintenanceId, updatedRequest).subscribe(() => {
+        this.router.navigate(['/maintenance']);
+      });
+    }
+  }
 }

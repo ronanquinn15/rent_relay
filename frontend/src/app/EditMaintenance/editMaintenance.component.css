@@ -1,0 +1,44 @@
+.container {
+  margin-top: 70px;
+}
+
+.card {
+  margin-top: 20px;
+}
+
+.card-header {
+  font-size: 1.25rem;
+}
+
+.card-body p {
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-check-input {
+  width: 2rem;
+  height: 1rem;
+  background-color: #007bff;
+  border-radius: 1rem;
+  transition: background-color 0.3s;
+}
+
+.form-check-input:checked {
+  background-color: #28a745;
+}
+
+.form-check-input:not(:checked) {
+  background-color: grey;
+}
+
+.form-check-label {
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
