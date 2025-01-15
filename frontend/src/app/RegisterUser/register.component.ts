@@ -45,6 +45,7 @@ export class RegisterComponent {
         },
         error => {
           console.error('Error registering user', error);
+          this.errorMessage = error.error.error; // Set the error message
         }
       );
     }
