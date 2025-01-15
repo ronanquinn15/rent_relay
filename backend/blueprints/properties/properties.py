@@ -3,6 +3,7 @@ from datetime import datetime
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, admin_required, tenant_required
+from validation import validate_required_fields, validate_text, validate_email_address, validate_username_length, validate_password_length
 
 properties_bp = Blueprint('properties', __name__)
 
@@ -54,6 +55,45 @@ def get_all_properties():
         return make_response(jsonify({'message': 'No properties are registered for this landlord'}), 404)
 
     return make_response(jsonify(properties_list), 200)
+
+@properties_bp.route('/api/tenant/property/details', methods=['GET'])
+@tenant_required
+def get_property_details_with_tenant():
+    tenant_id = auto_populate_tenant_id()
+    if not tenant_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    # Find the property associated with the tenant
+    property = properties.find_one({'tenant_id': ObjectId(tenant_id)})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found'}), 404)
+
+    property['_id'] = str(property['_id'])
+    property['landlord_id'] = str(property['landlord_id'])
+    property['tenant_id'] = str(property['tenant_id'])
+
+    # Fetch the landlord's contact details
+    landlord = landlords.find_one({'_id': ObjectId(property['landlord_id'])}, {'name': 1, 'email': 1, 'username': 1})
+    if not landlord:
+        return make_response(jsonify({'error': 'Landlord not found'}), 404)
+
+    property['landlord_details'] = {
+        'name': landlord.get('name'),
+        'email': landlord.get('email'),
+        'username': landlord.get('username')
+    }
+
+    # Fetch the tenants details
+    tenant = tenants.find_one({'_id': ObjectId(tenant_id)}, {'name': 1, 'email': 1, 'username': 1})
+    if not tenant:
+        return make_response(jsonify({'error': 'Tenant not found'}), 404)
+
+    property['tenant_details'] = {
+        'name': tenant.get('name'),
+        'email': tenant.get('email'),
+        'username': tenant.get('username')
+    }
+    return make_response(jsonify(property), 200)
 
 @properties_bp.route('/api/tenants/property', methods=['GET'])
 @landlord_required
@@ -124,21 +164,21 @@ def update_property(property_id):
     if not property:
         return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
 
-    update_fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent',
-                     'purchase_date', 'number_of_tenants']
+    update_fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'number_of_tenants']
     updated_information = {}
 
     for field in update_fields:
         if field in request.form:
+            value = request.form[field]
             if field == 'purchase_date':
                 try:
                     # Validate and reformat the purchase_date
-                    purchase_date = datetime.strptime(request.form[field], '%Y/%m/%d')
+                    purchase_date = datetime.strptime(value, '%Y/%m/%d')
                     updated_information[field] = purchase_date.strftime('%Y/%m/%d')
                 except ValueError:
                     return make_response(jsonify({'error': 'Invalid date format, should be yyyy/mm/dd'}), 400)
             else:
-                updated_information[field] = request.form[field]
+                updated_information[field] = value
 
     if 'tenant_id' in request.form:
         tenant_id = request.form['tenant_id']
@@ -165,8 +205,7 @@ def update_property(property_id):
         result = properties.update_one({'_id': property_obj_id}, {'$set': updated_information})
         if result.modified_count == 1:
             if 'tenant_id' in updated_information:
-                tenants.update_one({'_id': updated_information['tenant_id']},
-                                   {'$set': {'property_id': property_obj_id}})
+                tenants.update_one({'_id': updated_information['tenant_id']}, {'$set': {'property_id': property_obj_id}})
             return make_response(jsonify({'message': 'Property updated successfully'}), 200)
         else:
             return make_response(jsonify({'error': 'Property not found or no changes made'}), 404)
@@ -199,20 +238,34 @@ def update_property_landlord(property_id):
 @properties_bp.route('/api/properties/add', methods=['POST'])
 @landlord_required
 def add_property():
-    fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date', 'tenant_id']
-    if not all(field in request.form for field in fields):
-        return make_response(jsonify({"error": "Missing form data."}), 400)
+    fields = ['address', 'postcode', 'city', 'number_of_bedrooms', 'number_of_bathrooms', 'rent', 'purchase_date',
+              'tenant_id']
+
+    # Validate required fields
+    error = validate_required_fields(request.form, fields)
+    if error:
+        return make_response(jsonify({"error": error}), 400)
 
     landlord_id = auto_populate_landlord_id()
     if not landlord_id:
         return make_response(jsonify({'error': 'Landlord not found'}), 404)
 
     tenant_id = request.form['tenant_id']
-    tenant = tenants.find_one({'_id': ObjectId(tenant_id)})
+    try:
+        tenant_obj_id = ObjectId(tenant_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
+
+    tenant = tenants.find_one({'_id': tenant_obj_id})
     if not tenant:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
     if tenant['property_id']:
         return make_response(jsonify({'error': 'Tenant already assigned to a property'}), 400)
+
+    try:
+        purchase_date = datetime.strptime(request.form['purchase_date'], '%Y-%m-%d').strftime('%Y/%m/%d')
+    except ValueError:
+        return make_response(jsonify({'error': 'Invalid date format, should be yyyy-mm-dd'}), 400)
 
     new_property = {
         'address': str(request.form['address']),
@@ -221,15 +274,15 @@ def add_property():
         'number_of_bedrooms': int(request.form['number_of_bedrooms']),
         'number_of_bathrooms': int(request.form['number_of_bathrooms']),
         'rent': int(request.form['rent']),
-        'purchase_date': datetime.strptime(request.form['purchase_date'], '%Y-%m-%d').strftime('%Y/%m/%d'),
+        'purchase_date': purchase_date,
         'landlord_id': landlord_id,
         'number_of_tenants': 1,  # Set number_of_tenants to 1
-        'tenant_id': ObjectId(tenant_id)
+        'tenant_id': tenant_obj_id
     }
     new_property_id = properties.insert_one(new_property).inserted_id
 
     # Update tenant with property_id
-    tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': new_property_id}})
+    tenants.update_one({'_id': tenant_obj_id}, {'$set': {'property_id': new_property_id}})
 
     return make_response(jsonify({'message': 'Property added', 'property_id': str(new_property_id)}), 201)
 
@@ -249,6 +302,7 @@ def delete_property(property_id):
     if not property:
         return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
 
+    # Update tenant with property_id to None
     tenant_id = property.get('tenant_id')
     if tenant_id:
         tenants.update_one({'_id': ObjectId(tenant_id)}, {'$set': {'property_id': None}})
@@ -257,44 +311,3 @@ def delete_property(property_id):
     if result.deleted_count == 1:
         return make_response(jsonify({'message': 'Property deleted'}), 200)
     return make_response(jsonify({'error': 'Property not found'}), 404)
-
-@properties_bp.route('/api/tenant/property/details', methods=['GET'])
-@tenant_required
-def get_property_details_with_tenant():
-    tenant_id = auto_populate_tenant_id()
-    if not tenant_id:
-        return make_response(jsonify({'error': 'Unauthorized'}), 401)
-
-    # Find the property associated with the tenant
-    property = properties.find_one({'tenant_id': ObjectId(tenant_id)})
-    if not property:
-        return make_response(jsonify({'error': 'Property not found'}), 404)
-
-    property['_id'] = str(property['_id'])
-    property['landlord_id'] = str(property['landlord_id'])
-    property['tenant_id'] = str(property['tenant_id'])
-
-    # Fetch the landlord's contact details
-    landlord = landlords.find_one({'_id': ObjectId(property['landlord_id'])}, {'name': 1, 'email': 1, 'username': 1})
-    if not landlord:
-        return make_response(jsonify({'error': 'Landlord not found'}), 404)
-
-    property['landlord_details'] = {
-        'name': landlord.get('name'),
-        'email': landlord.get('email'),
-        'username': landlord.get('username')
-    }
-
-    # Fetch the tenants details
-    tenant = tenants.find_one({'_id': ObjectId(tenant_id)}, {'name': 1, 'email': 1, 'username': 1})
-    if not tenant:
-        return make_response(jsonify({'error': 'Tenant not found'}), 404)
-
-    property['tenant_details'] = {
-        'name': tenant.get('name'),
-        'email': tenant.get('email'),
-        'username': tenant.get('username')
-    }
-
-    return make_response(jsonify(property), 200)
-

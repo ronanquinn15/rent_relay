@@ -22,3 +22,8 @@ def validate_password_length(password):
     if len(password) < 6:
         return 'Password must be at least 6 characters long'
     return None
+
+def validate_text(text):
+    if not text.strip():
+        return 'Text cannot be empty'
+    return None

@@ -2,6 +2,7 @@ import globals, jwt, datetime, bson
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, tenant_required
+from validation import validate_required_fields, validate_text
 
 maintenance_bp = Blueprint('maintenance', __name__)
 
@@ -49,8 +50,10 @@ def create_maintenance_request():
     fields = ['description', 'urgency']
     allowed_urgent_values = ['low', 'medium', 'high']
 
-    if not all(field in request.form for field in fields):
-        return make_response(jsonify({'error': 'Missing fields'}), 400)
+    # Validate required fields
+    error = validate_required_fields(request.form, fields)
+    if error:
+        return make_response(jsonify({'error': error}), 400)
 
     tenant_id = auto_populate_tenant_id()
     if not tenant_id:
@@ -64,10 +67,16 @@ def create_maintenance_request():
     if urgency not in allowed_urgent_values:
         return make_response(jsonify({'error': 'Invalid urgency value'}), 400)
 
+    # Validate description
+    description = request.form['description']
+    error = validate_text(description)
+    if error:
+        return make_response(jsonify({'error': error}), 400)
+
     new_request = {
         'property_id': property_id,
         'tenant_id': tenant_id,
-        'description': str(request.form['description']),
+        'description': description,
         'urgency': urgency,
         'request_date': datetime.datetime.now().strftime('%d-%m-%Y'),
         'status': False,

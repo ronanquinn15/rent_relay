@@ -2,6 +2,7 @@ import bcrypt, globals, jwt, bson
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
 from decorators import landlord_required, admin_required
+from validation import validate_email_address, validate_username_length, validate_password_length
 
 landlord_bp = Blueprint('landlord', __name__)
 
@@ -62,16 +63,26 @@ def edit_landlord(landlord_id):
 
     for field in fields:
         if field in request.form:
-            if field in ['name', 'username', 'email']:
-                try:
-                    value = str(request.form[field])
-                    if field == 'email' and '@' not in value:
-                        return make_response(jsonify({'error': 'Invalid email address'}), 400)
-                    updated_information[field] = value
-                except (ValueError, TypeError):
-                    return make_response(jsonify({'error': 'Invalid field'}), 400)
+            value = request.form[field]
+            if field == 'name':
+                if not value.strip():
+                    return make_response(jsonify({'error': 'Name cannot be empty'}), 400)
+                updated_information['name'] = value
+            elif field == 'username':
+                error = validate_username_length(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['username'] = value
+            elif field == 'email':
+                error = validate_email_address(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['email'] = value
             elif field == 'password':
-                updated_information['password'] = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt())
+                error = validate_password_length(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['password'] = bcrypt.hashpw(value.encode("utf-8"), bcrypt.gensalt())
 
     if not updated_information:
         return make_response(jsonify({'error': 'No fields to update'}), 400)

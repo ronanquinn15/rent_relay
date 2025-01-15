@@ -1,7 +1,8 @@
 import globals, bcrypt, bson, jwt
 from bson import ObjectId
 from flask import Blueprint, make_response, jsonify, request
-from decorators import admin_required, tenant_required, landlord_required
+from decorators import admin_required, tenant_required
+from validation import validate_text, validate_email_address, validate_username_length, validate_password_length
 
 tenants_bp = Blueprint('tenants', __name__)
 
@@ -77,24 +78,6 @@ def get_tenant(tenant_id):
         return make_response(jsonify(tenant), 200)
     return make_response(jsonify({'error': 'Tenant not found'}), 404)
 
-@tenants_bp.route('/api/tenants', methods=['POST'])
-@admin_required
-def add_tenant():
-    fields = ['name', 'username', 'password', 'email']
-    if not all(field in request.form for field in fields):
-        return make_response(jsonify({'error': 'Missing fields'}), 400)
-
-    new_tenant = {
-        'name': str(request.form['name']),
-        'username': str(request.form['username']),
-        'email': str(request.form['email']),
-        'role': 'tenant',
-        'password': bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt()),
-        'property_id': None
-    }
-    newly_created_tenant = tenants.insert_one(new_tenant).inserted_id
-    return make_response(jsonify({'_id': str(newly_created_tenant)}), 201)
-
 @tenants_bp.route('/api/tenants/<tenant_id>', methods=['PUT'])
 @tenant_required
 def update_tenant(tenant_id):
@@ -113,16 +96,27 @@ def update_tenant(tenant_id):
 
     for field in fields:
         if field in request.form:
-            if field in ['name', 'username', 'email']:
-                try:
-                    value = str(request.form[field])
-                    if field == 'email' and '@' not in value:
-                        return make_response(jsonify({'error': 'Invalid email address'}), 400)
-                    updated_information[field] = value
-                except (ValueError, TypeError):
-                    return make_response(jsonify({'error': 'Invalid field'}), 400)
+            value = request.form[field]
+            if field == 'name':
+                error = validate_text(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['name'] = value
+            elif field == 'username':
+                error = validate_username_length(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['username'] = value
+            elif field == 'email':
+                error = validate_email_address(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['email'] = value
             elif field == 'password':
-                updated_information['password'] = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt())
+                error = validate_password_length(value)
+                if error:
+                    return make_response(jsonify({'error': error}), 400)
+                updated_information['password'] = bcrypt.hashpw(value.encode("utf-8"), bcrypt.gensalt())
 
     if not updated_information:
         return make_response(jsonify({'error': 'No fields to update'}), 400)
@@ -132,6 +126,7 @@ def update_tenant(tenant_id):
         return make_response(jsonify({'message': 'Tenant updated'}), 200)
     else:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
+
 @tenants_bp.route('/api/tenants/<tenant_id>', methods=['DELETE'])
 @admin_required
 def delete_tenant(tenant_id):
@@ -140,10 +135,12 @@ def delete_tenant(tenant_id):
     except bson.errors.InvalidId:
         return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
 
+    # Find tenant
     tenant = tenants.find_one({'_id': tenant_obj_id})
     if not tenant:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
 
+    # Remove tenant from property
     property_id = tenant.get('property_id')
     if property_id:
         properties.update_one({'_id': ObjectId(property_id)}, {'$set': {'tenant_id': None}})
