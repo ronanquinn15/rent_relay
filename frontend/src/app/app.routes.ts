@@ -11,6 +11,7 @@ import { EditMaintenanceComponent } from './EditMaintenance/editMaintenance.comp
 import { AddMaintenanceFormComponent } from './AddMaintenanceForm/addMaintenanceForm.component';
 import { EditTenantDetailsComponent } from './EditTenantInformation/editTenantDetails.component';
 import { EditLandlordDetailsComponent } from './EditLandlordInformation/editLandlordDetails.component';
+import { RegisterComponent } from './RegisterUser/register.component';
 
 export const routes: Routes = [
   {
@@ -19,7 +20,11 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    component: UserAuthComponent,
+    component: UserAuthComponent
+  },
+  {
+    path: 'register',
+    component: RegisterComponent
   },
   {
     path: 'tenant-details/edit',

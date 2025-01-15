@@ -36,6 +36,18 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // Register endpoint which sends a POST request to the server
+  postRegister(user: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('name', user.name);
+    postData.append('email', user.email);
+    postData.append('username', user.username);
+    postData.append('password', user.password);
+    postData.append('role', user.role);
+    const url = 'http://127.0.0.1:5000/api/register';
+    return this.http.post(url, postData);
+  }
+
   // GET landlord details based on logged in user
   // Landlord endpoint
   getLandlordInfo(): Observable<any> {
