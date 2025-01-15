@@ -47,6 +47,20 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  updateLandlordInfo(landlord_id: string, landlord: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('name', landlord.name);
+    postData.append('email', landlord.email);
+    postData.append('username', landlord.username);
+    postData.append('password', landlord.password);
+    const url = 'http://127.0.0.1:5000//api/landlords/' + landlord_id;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.put(url, postData, {headers});
+  }
+
   // GET all properties uploaded by a landlord - Used for AG-Grid
   // Landlord endpoint
   getProperties(): Observable<any> {

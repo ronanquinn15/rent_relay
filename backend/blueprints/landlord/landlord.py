@@ -52,27 +52,31 @@ def edit_landlord(landlord_id):
     except bson.errors.InvalidId:
         return make_response(jsonify({'error': 'Invalid landlord_id'}), 400)
 
+    # Ensure the landlord can only update their own information
     token_landlord_id = auto_populate_landlord_id()
     if not token_landlord_id or token_landlord_id != landlord_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
 
     fields = ['name', 'username', 'email', 'password']
-    update_fields = {}
+    updated_information = {}
 
     for field in fields:
         if field in request.form:
             if field in ['name', 'username', 'email']:
                 try:
-                    update_fields[field] = str(request.form[field])
+                    value = str(request.form[field])
+                    if field == 'email' and '@' not in value:
+                        return make_response(jsonify({'error': 'Invalid email address'}), 400)
+                    updated_information[field] = value
                 except (ValueError, TypeError):
                     return make_response(jsonify({'error': 'Invalid field'}), 400)
             elif field == 'password':
-                update_fields['password'] = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt())
+                updated_information['password'] = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt())
 
-    if not update_fields:
+    if not updated_information:
         return make_response(jsonify({'error': 'No fields to update'}), 400)
 
-    result = landlords.update_one({'_id': landlord_obj_id}, {'$set': update_fields})
+    result = landlords.update_one({'_id': landlord_obj_id}, {'$set': updated_information})
     if result.modified_count == 1:
         return make_response(jsonify({'message': 'Landlord updated'}), 200)
     else:
