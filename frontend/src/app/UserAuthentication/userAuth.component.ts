@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { CommonModule } from '@angular/common';

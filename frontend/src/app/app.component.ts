@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavigationComponent } from './Navigation/nav.component';
-import { WebService } from './WebService/web.service';
+import { WebService } from './Services/web.service';
 
 @Component({
   selector: 'app-root',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 
 @Component({
   selector: 'app-add-property',

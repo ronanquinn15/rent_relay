@@ -1,10 +1,10 @@
 import { Component, Inject, Output, EventEmitter } from '@angular/core';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 import { Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { AsyncPipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../AuthenticationService/authService.component';
+import { AuthService } from '../Services/authService.service';
 
 @Component({
   selector: 'auth-button',

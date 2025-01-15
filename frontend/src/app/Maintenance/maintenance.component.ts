@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { AuthService } from '../AuthenticationService/authService.component';
+import { AuthService } from '../Services/authService.service';
 
 @Component({
   selector: 'maintenance',

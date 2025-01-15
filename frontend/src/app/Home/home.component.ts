@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-community';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../AuthenticationService/authService.component';
+import { AuthService } from '../Services/authService.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 

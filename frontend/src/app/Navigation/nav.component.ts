@@ -4,7 +4,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { AuthButtonComponent } from '../AuthenticationButton/authButton.component';
 import { UserAuthComponent } from '../UserAuthentication/userAuth.component';
 import { BehaviorSubject } from 'rxjs';
-import { AuthService } from '../AuthenticationService/authService.component';
+import { AuthService } from '../Services/authService.service';
 
 @Component({
   selector: 'navigation',

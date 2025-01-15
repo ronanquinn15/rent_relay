@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 

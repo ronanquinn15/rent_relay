@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { WebService } from '../WebService/web.service';
+import { WebService } from '../Services/web.service';
 
 @Component({
   selector: 'app-property',
