@@ -9,6 +9,7 @@ import { AddPropertyComponent } from './AddProperty/addProperty.component';
 import { MaintenanceViewComponent } from './MaintenanceView/maintenanceView.component';
 import { EditMaintenanceComponent } from './EditMaintenance/editMaintenance.component';
 import { AddMaintenanceFormComponent } from './AddMaintenanceForm/addMaintenanceForm.component';
+import { EditTenantDetailsComponent } from './EditTenantInformation/editTenantDetails.component';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,10 @@ export const routes: Routes = [
   {
     path: 'login',
     component: UserAuthComponent,
+  },
+  {
+    path: 'tenant-details/edit',
+    component: EditTenantDetailsComponent
   },
   {
     path: 'landlords/properties',

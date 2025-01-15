@@ -224,4 +224,20 @@ export class WebService {
     return this.http.delete(url, {headers});
   }
 
+  // PUT for updating tenant information
+  // Tenant endpoint
+  updateTenantInfo(tenant_id: string, tenant: any): Observable<any> {
+    let postData = new FormData();
+    postData.append('name', tenant.name);
+    postData.append('email', tenant.email);
+    postData.append('username', tenant.username);
+    postData.append('password', tenant.password);
+    const url = 'http://127.0.0.1:5000/api/tenants/' + tenant_id;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.put(url, postData, {headers});
+  }
+
 }

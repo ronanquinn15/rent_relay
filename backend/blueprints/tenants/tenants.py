@@ -103,6 +103,11 @@ def update_tenant(tenant_id):
     except bson.errors.InvalidId:
         return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
 
+    # Ensure the tenant can only update their own information
+    token_tenant_id = auto_populate_tenant_id()
+    if not token_tenant_id or token_tenant_id != tenant_obj_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
     fields = ['name', 'username', 'email', 'password']
     updated_information = {}
 
@@ -110,7 +115,10 @@ def update_tenant(tenant_id):
         if field in request.form:
             if field in ['name', 'username', 'email']:
                 try:
-                    updated_information[field] = str(request.form[field])
+                    value = str(request.form[field])
+                    if field == 'email' and '@' not in value:
+                        return make_response(jsonify({'error': 'Invalid email address'}), 400)
+                    updated_information[field] = value
                 except (ValueError, TypeError):
                     return make_response(jsonify({'error': 'Invalid field'}), 400)
             elif field == 'password':
@@ -124,7 +132,6 @@ def update_tenant(tenant_id):
         return make_response(jsonify({'message': 'Tenant updated'}), 200)
     else:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
-
 @tenants_bp.route('/api/tenants/<tenant_id>', methods=['DELETE'])
 @admin_required
 def delete_tenant(tenant_id):
