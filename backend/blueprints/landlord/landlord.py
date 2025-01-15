@@ -30,23 +30,6 @@ def get_all_landlords():
         landlords_list.append(landlord)
     return make_response(jsonify(landlords_list), 200)
 
-@landlord_bp.route('/api/landlords' , methods=['POST'])
-@admin_required
-def add_landlord():
-    fields = ['name', 'username', 'password', 'email']
-    if not all(field in request.form for field in fields):
-        return make_response(jsonify({'error': 'Missing fields'}), 400)
-
-    new_landlord = {
-        'name': str(request.form['name']),
-        'username': str(request.form['username']),
-        'email': str(request.form['email']),
-        'role': 'landlord',
-        'password': bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt()),
-    }
-    newly_created_landlord = landlords.insert_one(new_landlord).inserted_id,
-    return make_response(jsonify({'_id': str(newly_created_landlord)}), 201)
-
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['PUT'])
 @landlord_required
 def edit_landlord(landlord_id):
