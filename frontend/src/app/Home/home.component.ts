@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   data: any[] = [];
   tenantProperty: any = {};
   tenantInfo: any = {};
+  landlordInfo: any = {};
 
   headings: ColDef[] = [
     { field: "address" },
@@ -51,13 +52,20 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  loadLandlordInfo(): void {
+    this.webService.getLandlordInfo().subscribe((resp) => {
+      this.landlordInfo = resp;
+    });
+  }
+
   ngOnInit() {
     this.userRole = this.authService.getUserRole();
     if (this.userRole === 'landlord') {
+      this.loadLandlordInfo();
       this.loadProperties();
     } else if (this.userRole === 'tenant') {
-      this.loadTenantProperty();
       this.loadTenantInfo();
+      this.loadTenantProperty();
     }
   }
 
@@ -75,6 +83,10 @@ export class HomeComponent implements OnInit {
 
   editTenant(): void {
     this.router.navigate(['tenant-details/edit']);
+  }
+
+  editLandlord(): void {
+    this.router.navigate(['landlord-details/edit']);
   }
 
 }

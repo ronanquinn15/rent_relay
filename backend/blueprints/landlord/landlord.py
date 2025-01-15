@@ -21,6 +21,20 @@ def auto_populate_landlord_id():
             return None
     return None
 
+@landlord_bp.route('/api/landlords/details', methods=['GET'])
+@landlord_required
+def get_landlord_details():
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    landlord = landlords.find_one({'_id': ObjectId(landlord_id)}, {'password': 0})
+    if landlord:
+        landlord['_id'] = str(landlord['_id'])
+        return make_response(jsonify(landlord), 200)
+    else:
+        return make_response(jsonify({'error': 'Landlord not found'}), 404)
+
 @landlord_bp.route('/api/landlords', methods=['GET'])
 @admin_required
 def get_all_landlords():

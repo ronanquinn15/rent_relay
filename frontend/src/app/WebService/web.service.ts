@@ -36,6 +36,17 @@ export class WebService {
     return this.http.get(url, { headers });
   }
 
+  // GET landlord details based on logged in user
+  // Landlord endpoint
+  getLandlordInfo(): Observable<any> {
+    const url = 'http://127.0.0.1:5000//api/landlords/details';
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get(url, { headers });
+  }
+
   // GET all properties uploaded by a landlord - Used for AG-Grid
   // Landlord endpoint
   getProperties(): Observable<any> {
