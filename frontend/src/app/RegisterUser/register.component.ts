@@ -21,6 +21,7 @@ export class RegisterComponent {
     password: '',
     role: ''
   };
+  errorMessage: string = '';
 
   constructor(private webService: WebService, private router: Router) {}
 
@@ -38,6 +39,7 @@ export class RegisterComponent {
             },
             loginError => {
               console.error('Error logging in user', loginError);
+              this.errorMessage = loginError.error.message; // Set the error message
             }
           );
         },
