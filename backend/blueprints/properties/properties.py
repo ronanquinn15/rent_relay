@@ -56,6 +56,28 @@ def get_all_properties():
 
     return make_response(jsonify(properties_list), 200)
 
+@properties_bp.route('/api/properties/<property_id>', methods=['GET'])
+@landlord_required
+def get_one_property(property_id):
+    landlord_id = auto_populate_landlord_id()
+    if not landlord_id:
+        return make_response(jsonify({'error': 'Unauthorized'}), 401)
+
+    try:
+        property_obj_id = ObjectId(property_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid property_id'}), 400)
+
+    property = properties.find_one({'_id': property_obj_id, 'landlord_id': ObjectId(landlord_id)})
+    if not property:
+        return make_response(jsonify({'error': 'Property not found or unauthorized access'}), 404)
+
+    property['_id'] = str(property['_id'])
+    property['landlord_id'] = str(property['landlord_id'])
+    property['tenant_id'] = str(property['tenant_id'])
+
+    return make_response(jsonify(property), 200)
+
 @properties_bp.route('/api/tenant/property/details', methods=['GET'])
 @tenant_required
 def get_property_details_with_tenant():

@@ -12,6 +12,7 @@ import { AddMaintenanceFormComponent } from './AddMaintenanceForm/addMaintenance
 import { EditTenantDetailsComponent } from './EditTenantInformation/editTenantDetails.component';
 import { EditLandlordDetailsComponent } from './EditLandlordInformation/editLandlordDetails.component';
 import { RegisterComponent } from './RegisterUser/register.component';
+import { ChatComponent } from './ChatComponent/chat.component';
 
 export const routes: Routes = [
   {
@@ -65,5 +66,9 @@ export const routes: Routes = [
   {
     path: 'maintenance/:id/edit',
     component: EditMaintenanceComponent
+  },
+  {
+    path: 'chat',
+    component: ChatComponent
   }
 ];

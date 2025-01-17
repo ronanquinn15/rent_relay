@@ -1,0 +1,23 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Chat Room</h2>
+  </div>
+  <div *ngIf="properties.length > 0" class="property-select">
+    <label for="property">Select Property:</label>
+    <select id="property" [(ngModel)]="selectedProperty" (change)="onPropertySelect()">
+      <option *ngFor="let property of properties" [value]="property._id.$oid">{{ property.address }}</option>
+    </select>
+    <p>Selected Property ID: {{ selectedProperty }}</p> <!-- Display the selected property ID -->
+  </div>
+  <p *ngIf="properties.length === 0">No properties available</p>
+  <!-- Display a message if no properties are available -->
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages" class="chat-message">
+      <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
+    </div>
+  </div>
+  <div class="chat-input">
+    <input [(ngModel)]="message" placeholder="Type your message here..." class="message-input">
+    <button (click)="sendMessage()" class="send-button">Send</button>
+  </div>
+</div>
