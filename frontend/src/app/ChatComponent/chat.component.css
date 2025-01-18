@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   max-width: 600px;
+  height: 600px; /* Set a fixed height for the chat container */
   margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -17,6 +18,7 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  max-height: 400px; /* Set a fixed maximum height */
   margin-bottom: 16px;
   padding: 8px;
   border: 1px solid #ddd;
