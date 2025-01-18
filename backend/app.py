@@ -27,35 +27,35 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client['rentRelayDB']
 messages_collection = db['messages']
 
-class ChatNamespace(Namespace):
-    def on_join(self, data):
-        room = data['property_id']
-        join_room(room)
-        emit('status', {'msg': f'{data["user"]} has entered the room.'}, room=room)
-
-    def on_leave(self, data):
-        room = data['property_id']
-        leave_room(room)
-        emit('status', {'msg': f'{data["user"]} has left the room.'}, room=room)
-
-    def on_message(self, data):
-        room = data['property_id']
-        message = {
-            'room': room,
-            'sender': data['sender'],
-            'receiver': data['receiver'],
-            'msg': data['msg'],
-            'timestamp': datetime.utcnow(),
-            'read_receipt': False
-        }
-        messages_collection.insert_one(message)
-        emit('message', message, room=room)
-
-socketio.on_namespace(ChatNamespace('/chat'))
-
-@app.route('/')
-def index():
-    return render_template('index.html')
+# class ChatNamespace(Namespace):
+#     def on_join(self, data):
+#         room = data['property_id']
+#         join_room(room)
+#         emit('status', {'msg': f'{data["user"]} has entered the room.'}, room=room)
+#
+#     def on_leave(self, data):
+#         room = data['property_id']
+#         leave_room(room)
+#         emit('status', {'msg': f'{data["user"]} has left the room.'}, room=room)
+#
+#     def on_message(self, data):
+#         room = data['property_id']
+#         message = {
+#             'room': room,
+#             'sender': data['sender'],
+#             'receiver': data['receiver'],
+#             'msg': data['msg'],
+#             'timestamp': datetime.utcnow(),
+#             'read_receipt': False
+#         }
+#         messages_collection.insert_one(message)
+#         emit('message', message, room=room)
+#
+# socketio.on_namespace(ChatNamespace('/chat'))
+#
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 @app.route('/messages/<property_id>', methods=['GET'])
 def get_messages(property_id):
@@ -72,11 +72,6 @@ def get_messages(property_id):
         messages_list.append(message)
 
     return make_response(jsonify(messages_list)), 200
-
-@app.route('/messages/read/<message_id>', methods=['POST'])
-def mark_message_as_read(message_id):
-    messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
-    return jsonify({'status': 'success'})
 
 @socketio.on('message')
 def handle_message(data):
@@ -103,6 +98,11 @@ def handle_message(data):
 
     # Emit the message to the receiver
     emit('message', message, room=receiver)
+
+@app.route('/messages/read/<message_id>', methods=['POST'])
+def mark_message_as_read(message_id):
+    messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
+    return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
