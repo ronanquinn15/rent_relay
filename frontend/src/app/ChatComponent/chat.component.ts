@@ -117,25 +117,43 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage(): void {
-    if (this.message.trim() && this.selectedProperty) {
-      const sender = this.userService.getLoggedInUser();
-      const receiver = this.userRole === 'landlord' ? 'tenant' : 'landlord';
-      const newMessage = {
-        sender,
-        msg: this.message,
-        propertyId: this.selectedProperty
-      };
+  if (this.message.trim()) {
+    const sender = this.userService.getLoggedInUser();
+    const receiver = this.userRole === 'landlord' ? 'tenant' : 'landlord';
 
-      // Send the message to the server with the required arguments
-      this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, '', newMessage.msg);
-
-      // Add the message to the local messages array
-      this.messages.push(newMessage);
-
-      // Clear the input field
-      this.message = '';
+    if (this.userRole === 'landlord') {
+      const propertyId = this.selectedProperty;
+      this.sendMessageToServer(propertyId, sender, receiver, this.message);
     } else {
-      console.error('Message or selected property is empty');
+      this.userService.getTenantPropertyID().subscribe(
+        (propertyId) => {
+          this.sendMessageToServer(propertyId, sender, receiver, this.message);
+        },
+        (error) => {
+          console.error('Error fetching tenant property ID', error);
+        }
+      );
     }
+  } else {
+    console.error('Message is empty');
   }
+}
+
+private sendMessageToServer(propertyId: string, sender: string, receiver: string, message: string): void {
+  const newMessage = {
+    sender,
+    msg: message,
+    propertyId
+  };
+
+  // Send the message to the server with the required arguments
+  this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
+
+  // Add the message to the local messages array
+  this.messages.push(newMessage);
+
+  // Clear the input field
+  this.message = '';
+}
+
 }
