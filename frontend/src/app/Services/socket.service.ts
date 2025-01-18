@@ -37,11 +37,8 @@ export class SocketService {
     });
   }
 
-  onStatus(): Observable<any> {
-    return new Observable(observer => {
-      this.socket.on('status', (data) => {
-        observer.next(data);
-      });
-    });
+  updateReadStatus(message_id: string) {
+    this.socket.emit('update_read_receipt', {message_id});
   }
+
 }

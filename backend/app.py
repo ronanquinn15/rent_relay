@@ -99,10 +99,12 @@ def handle_message(data):
 
     # Emit the message to the receiver
     emit('message', message, room=receiver)
-@app.route('/messages/read/<message_id>', methods=['POST'])
-def mark_message_as_read(message_id):
+
+@socketio.on('update_read_receipt')
+def update_read_receipt(data):
+    message_id = data['message_id']
     messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
-    return jsonify({'status': 'success'})
+    socketio.emit('read_receipt_updated', {'message_id': message_id})
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

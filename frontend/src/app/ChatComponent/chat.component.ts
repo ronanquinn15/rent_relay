@@ -36,37 +36,43 @@ export class ChatComponent implements OnInit {
       this.getProperties();
       this.socketService.onMessage().subscribe((msg) => {
         this.messages.push(msg);
+        this.markAsRead(msg._id);
       });
     } else if (this.userRole === 'tenant') {
       this.fetchMessagesForTenant();
       this.socketService.onMessage().subscribe((msg) => {
         this.messages.push(msg);
+        this.markAsRead(msg._id);
       });
     }
   }
 
+  markAsRead(messageId: string): void {
+    this.socketService.updateReadStatus(messageId);
+  }
 
   fetchMessagesForTenant(): void {
-    this.userService.getTenantPropertyID().subscribe(
-      (tenantPropertyId) => {
-        if (tenantPropertyId) {
-          this.socketService.getMessages(tenantPropertyId).subscribe(
-            (messages) => {
-              this.messages = messages;
-            },
-            (error) => {
-              console.error('Error fetching messages for tenant', error);
-            }
-          );
-        } else {
-          console.error('Tenant property ID is not available');
-        }
-      },
-      (error) => {
-        console.error('Error fetching tenant property ID', error);
+  this.userService.getTenantPropertyID().subscribe(
+    (tenantPropertyId) => {
+      if (tenantPropertyId) {
+        this.socketService.getMessages(tenantPropertyId).subscribe(
+          (messages) => {
+            this.messages = messages;
+            messages.forEach((msg: any) => this.markAsRead(msg._id)); // Mark each message as read
+          },
+          (error) => {
+            console.error('Error fetching messages for tenant', error);
+          }
+        );
+      } else {
+        console.error('Tenant property ID is not available');
       }
-    );
-  }
+    },
+    (error) => {
+      console.error('Error fetching tenant property ID', error);
+    }
+  );
+}
 
   getProperties(): void {
     this.userService.getPropertiesByLandlord().subscribe(
@@ -81,21 +87,22 @@ export class ChatComponent implements OnInit {
   }
 
   loadMessages(): void {
-    this.selectedProperty = '6776e3e94527ce5d8fbf7988';
-    if (this.selectedProperty) {
-      this.socketService.getMessages(this.selectedProperty).subscribe(
-        (data) => {
-          console.log('Fetched Messages:', data); // Log the fetched messages
-          this.messages = data;
-        },
-        (error) => {
-          console.error('Error fetching messages', error);
-        }
-      );
-    } else {
-      console.error('No property selected');
-    }
+  this.selectedProperty = '6776e3e94527ce5d8fbf7988';
+  if (this.selectedProperty) {
+    this.socketService.getMessages(this.selectedProperty).subscribe(
+      (data) => {
+        console.log('Fetched Messages:', data); // Log the fetched messages
+        this.messages = data;
+        data.forEach((msg: any) => this.markAsRead(msg._id)); // Mark each message as read
+      },
+      (error) => {
+        console.error('Error fetching messages', error);
+      }
+    );
+  } else {
+    console.error('No property selected');
   }
+}
 
   onPropertySelect(): void {
     this.selectedProperty = '6776e3e94527ce5d8fbf7988';
