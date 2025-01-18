@@ -1,24 +1,46 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  max-width: 600px;
-  height: 600px; /* Set a fixed height for the chat container */
-  margin: 0 auto;
+  max-width: 1200px;
+  height: 700px;
+  margin: 70px auto 0;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px;
   background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .chat-header {
   text-align: center;
   margin-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.property-select {
+  margin-bottom: 16px;
+}
+
+.property-select label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.property-select select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1em;
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  max-height: 400px; /* Set a fixed maximum height */
+  max-height: 600px;
   margin-bottom: 16px;
   padding: 8px;
   border: 1px solid #ddd;
@@ -26,15 +48,33 @@
   background-color: #fff;
 }
 
-.status-message {
-  color: #888;
-  font-style: italic;
+.chat-message {
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.chat-message {
-  margin-bottom: 8px;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
+.chat-message.sender {
+  background-color: #007bff;
+  color: #fff;
+  align-self: flex-end;
+}
+
+.chat-message.receiver {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+
+.chat-message p {
+  margin: 0;
+}
+
+.chat-message strong {
+  display: block;
+  margin-bottom: 4px;
+  color: inherit;
 }
 
 .message-meta {
@@ -42,19 +82,23 @@
   justify-content: space-between;
   font-size: 0.85em;
   color: #888;
+  margin-top: 8px;
 }
 
 .timestamp {
   font-style: italic;
+  color: ghostwhite;
 }
 
 .read-receipt {
-  color: green;
+  color: white;
 }
 
 .chat-input {
   display: flex;
   align-items: center;
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
 }
 
 .message-input {
@@ -72,6 +116,7 @@
   background-color: #007bff;
   color: #fff;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .send-button:hover {

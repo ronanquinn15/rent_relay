@@ -1,36 +1,39 @@
-<div class="chat-container" style="margin-top: 70px">
-  <div class="chat-header">
+<div class="chat-container">
+  <header class="chat-header">
     <h2>Chat Room</h2>
-  </div>
+  </header>
 
   <!-- Landlord's HTML -->
   <ng-container *ngIf="userRole === 'landlord'">
-    <div *ngIf="properties.length > 0" class="property-select">
+    <section class="property-select">
       <label for="property-select">Select Property:</label>
       <select id="property-select" [(ngModel)]="selectedProperty" (ngModelChange)="loadMessages()">
         <option *ngFor="let property of properties" [value]="property._id">{{ property.name }} - {{ property.address }}</option>
       </select>
       <p>Selected Property ID: {{ selectedProperty }}</p>
-    </div>
+    </section>
     <p *ngIf="properties.length === 0">No properties available</p>
   </ng-container>
 
   <!-- Tenant's HTML -->
   <ng-container *ngIf="userRole === 'tenant'">
-    <p>Messages for your property:</p>
+    <section class="tenant-messages">
+      <p>Messages for your property:</p>
+    </section>
   </ng-container>
 
-  <div class="chat-messages">
-    <div *ngFor="let msg of messages" class="chat-message">
+  <section class="chat-messages">
+    <div *ngFor="let msg of messages" class="chat-message" [ngClass]="{'sender': msg.sender === userService.getLoggedInUser(), 'receiver': msg.sender !== userService.getLoggedInUser()}">
       <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
       <p class="message-meta">
-        <span class="timestamp">{{ msg.timestamp | date:'short' }}</span>
-        <span class="read-receipt" *ngIf="msg.read_receipt">Viewed &#10003;</span>
+        <span class="timestamp">{{ msg.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span class="read-receipt" *ngIf="msg.read_receipt && msg.sender === userService.getLoggedInUser()">Viewed &#10003;</span>
       </p>
     </div>
-  </div>
-  <div class="chat-input">
+  </section>
+
+  <footer class="chat-input">
     <input [(ngModel)]="message" placeholder="Type your message here..." class="message-input">
     <button (click)="sendMessage()" class="send-button">Send</button>
-  </div>
+  </footer>
 </div>

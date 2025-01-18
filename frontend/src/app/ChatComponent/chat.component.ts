@@ -24,7 +24,7 @@ export class ChatComponent implements OnInit {
   message: string = '';
   userRole: string = '';
 
-  constructor(private userService: UserService,
+  constructor(public userService: UserService,
               private socketService: SocketService,
               private authService: AuthService) {
   }
