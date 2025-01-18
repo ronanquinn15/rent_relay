@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 interface DecodedToken extends JwtPayload {
+  user_id: string;
   user: string;
-  property_id: string;
 }
 
 @Injectable({
@@ -17,11 +17,11 @@ export class UserService {
   constructor(private authService: AuthService,
               private http: HttpClient) {}
 
-  getPropertyId(): string {
+  getLoggedInUserId(): string {
     const token = sessionStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode<DecodedToken>(token);
-      return decodedToken.property_id;
+      return decodedToken.user_id;
     }
     return '';
   }
@@ -33,29 +33,6 @@ export class UserService {
       return decodedToken.user;
     }
     return '';
-  }
-
-  getAssociatedUser(): Observable<string> {
-    const propertyId = this.getPropertyId();
-    const url = `http://127.0.0.1:5000/api/properties/${propertyId}`;
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'x-access-token': token || ''
-    });
-    return this.http.get<any>(url, { headers }).pipe(
-      map((property: any) => {
-        const loggedInUser = this.getLoggedInUser();
-        if (this.authService.getUserRole() === 'landlord') {
-          return property.tenant_id.$oid;
-        } else {
-          return property.landlord_id.$oid;
-        }
-      })
-    );
-  }
-
-  isLandlord(): boolean {
-    return this.authService.getUserRole() === 'landlord';
   }
 
   getPropertiesByLandlord(): Observable<any[]> {
@@ -75,4 +52,19 @@ export class UserService {
     });
     return this.http.get<any>(url, { headers });
   }
+
+  getTenantPropertyID(): Observable<string> {
+    const userId = this.getLoggedInUserId();
+    const url = `http://127.0.0.1:5000/api/tenant/${userId}/property`;
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-access-token': token || ''
+    });
+    return this.http.get<any>(url, { headers }).pipe(
+      map((response) => {
+        return response.property_id;
+      })
+    );
+  }
+
 }

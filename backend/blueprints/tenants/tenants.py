@@ -50,6 +50,19 @@ def get_tenant_info():
     else:
         return make_response(jsonify({'error': 'Tenant not found'}), 404)
 
+@tenants_bp.route('/api/tenant/<tenant_id>/property', methods=['GET'])
+@tenant_required
+def get_tenant_property(tenant_id):
+    try:
+        tenant_obj_id = ObjectId(tenant_id)
+    except bson.errors.InvalidId:
+        return make_response(jsonify({'error': 'Invalid tenant_id'}), 400)
+
+    tenant = tenants.find_one({'_id': tenant_obj_id}, {'property_id': 1})
+    if tenant and 'property_id' in tenant:
+        return make_response(jsonify({'property_id': str(tenant['property_id'])}), 200)
+    else:
+        return make_response(jsonify({'error': 'Property ID not found for tenant'}), 404)
 
 @tenants_bp.route('/api/tenants', methods=['GET'])
 @admin_required

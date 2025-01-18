@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../Services/user.service';
-import { SocketService } from '../Services/socket.service';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {UserService} from '../Services/user.service';
+import {SocketService} from '../Services/socket.service';
+import {AuthService} from '../Services/authService.service';
+import {FormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-chat',
@@ -13,7 +14,7 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     CommonModule
   ],
-  providers: [SocketService]
+  providers: [SocketService, AuthService]
 })
 
 export class ChatComponent implements OnInit {
@@ -21,14 +22,50 @@ export class ChatComponent implements OnInit {
   selectedProperty: string = '';
   messages: any[] = [];
   message: string = '';
+  userRole: string = '';
 
-  constructor(private userService: UserService, private socketService: SocketService) {}
+  constructor(private userService: UserService,
+              private socketService: SocketService,
+              private authService: AuthService) {
+  }
+
 
   ngOnInit(): void {
-    this.getProperties();
-    this.socketService.onMessage().subscribe((msg) => {
-      this.messages.push(msg);
-    });
+    this.userRole = this.authService.getUserRole();
+    if (this.userRole === 'landlord') {
+      this.getProperties();
+      this.socketService.onMessage().subscribe((msg) => {
+        this.messages.push(msg);
+      });
+    } else if (this.userRole === 'tenant') {
+      this.fetchMessagesForTenant();
+      this.socketService.onMessage().subscribe((msg) => {
+        this.messages.push(msg);
+      });
+    }
+  }
+
+
+  fetchMessagesForTenant(): void {
+    this.userService.getTenantPropertyID().subscribe(
+      (tenantPropertyId) => {
+        if (tenantPropertyId) {
+          this.socketService.getMessages(tenantPropertyId).subscribe(
+            (messages) => {
+              this.messages = messages;
+            },
+            (error) => {
+              console.error('Error fetching messages for tenant', error);
+            }
+          );
+        } else {
+          console.error('Tenant property ID is not available');
+        }
+      },
+      (error) => {
+        console.error('Error fetching tenant property ID', error);
+      }
+    );
   }
 
   getProperties(): void {
@@ -82,6 +119,7 @@ export class ChatComponent implements OnInit {
   sendMessage(): void {
     if (this.message.trim() && this.selectedProperty) {
       const sender = this.userService.getLoggedInUser();
+      const receiver = this.userRole === 'landlord' ? 'tenant' : 'landlord';
       const newMessage = {
         sender,
         msg: this.message,
