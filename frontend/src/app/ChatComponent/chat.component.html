@@ -15,7 +15,7 @@
       <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
       <p class="message-meta">
         <span class="timestamp">{{ msg.timestamp | date:'short' }}</span>
-        <span class="read-receipt" *ngIf="msg.read_receipt">Read</span>
+        <span class="read-receipt" *ngIf="msg.read_receipt">Read&#10003;</span>
       </p>
     </div>
   </div>

@@ -92,13 +92,13 @@ def handle_message(data):
         'sender': sender,
         'receiver': receiver,
         'msg': msg,
-        'timestamp': datetime.utcnow()
+        'timestamp': datetime.utcnow(),
+        'read_receipt': False  # Add the read_receipt field
     }
     db.messages.insert_one(message)
 
     # Emit the message to the receiver
     emit('message', message, room=receiver)
-
 @app.route('/messages/read/<message_id>', methods=['POST'])
 def mark_message_as_read(message_id):
     messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
