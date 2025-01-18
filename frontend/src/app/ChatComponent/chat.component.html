@@ -22,15 +22,15 @@
     </section>
   </ng-container>
 
-  <section class="chat-messages">
-    <div *ngFor="let msg of messages" class="chat-message" [ngClass]="{'sender': msg.sender === userService.getLoggedInUser(), 'receiver': msg.sender !== userService.getLoggedInUser()}">
-      <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
-      <p class="message-meta">
-        <span class="timestamp">{{ msg.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
-        <span class="read-receipt" *ngIf="msg.read_receipt && msg.sender === userService.getLoggedInUser()">Viewed &#10003;</span>
-      </p>
-    </div>
-  </section>
+  <section class="chat-messages" #chatMessages>
+  <div *ngFor="let msg of messages" class="chat-message" [ngClass]="{'sender': msg.sender === userService.getLoggedInUser(), 'receiver': msg.sender !== userService.getLoggedInUser()}">
+    <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
+    <p class="message-meta">
+      <span class="timestamp">{{ msg.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+      <span class="read-receipt" *ngIf="msg.read_receipt && msg.sender === userService.getLoggedInUser()">Viewed &#10003;</span>
+    </p>
+  </div>
+</section>
 
   <footer class="chat-input">
     <input [(ngModel)]="message" placeholder="Type your message here..." class="message-input">
