@@ -78,7 +78,6 @@ def mark_message_as_read(message_id):
     messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
     return jsonify({'status': 'success'})
 
-
 @socketio.on('message')
 def handle_message(data):
     property_id = data['property_id']
@@ -86,9 +85,15 @@ def handle_message(data):
     receiver = data['receiver']
     msg = data['msg']
 
+    try:
+        property_obj_id = ObjectId(property_id)
+    except bson.errors.InvalidId:
+        emit('error', {'error': 'Invalid property_id'})
+        return
+
     # Save the message to the database
     message = {
-        'property_id': property_id,
+        'property_id': property_obj_id,
         'sender': sender,
         'receiver': receiver,
         'msg': msg,
