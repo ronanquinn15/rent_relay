@@ -6,9 +6,9 @@
   <!-- Landlord's HTML -->
   <ng-container *ngIf="userRole === 'landlord'">
     <div *ngIf="properties.length > 0" class="property-select">
-      <label for="property">Select Property:</label>
-      <select id="property" [(ngModel)]="selectedProperty" (change)="onPropertySelect()">
-        <option *ngFor="let property of properties" [value]="property._id.$oid">{{ property.address }}</option>
+      <label for="property-select">Select Property:</label>
+      <select id="property-select" [(ngModel)]="selectedProperty" (ngModelChange)="loadMessages()">
+        <option *ngFor="let property of properties" [value]="property._id">{{ property.name }} - {{ property.address }}</option>
       </select>
       <p>Selected Property ID: {{ selectedProperty }}</p>
     </div>

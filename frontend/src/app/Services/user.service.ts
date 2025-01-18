@@ -36,13 +36,18 @@ export class UserService {
   }
 
   getPropertiesByLandlord(): Observable<any[]> {
-    const url = `http://127.0.0.1:5000/api/properties`;
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'x-access-token': token || ''
-    });
-    return this.http.get<any[]>(url, { headers });
-  }
+  const url = `http://127.0.0.1:5000/api/properties`;
+  const token = sessionStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'x-access-token': token || ''
+  });
+  return this.http.get<any[]>(url, { headers }).pipe(
+    map(properties => properties.map(property => ({
+      ...property,
+      address: property.address // Ensure address is included
+    })))
+  );
+}
 
   getPropertyById(propertyId: string): Observable<any> {
     const url = `http://127.0.0.1:5000/api/properties/${propertyId}`;
