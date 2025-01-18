@@ -143,20 +143,23 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   private sendMessageToServer(propertyId: string, sender: string, receiver: string, message: string): void {
-    const newMessage = {
-      sender,
-      msg: message,
-      propertyId
-    };
+  const newMessage = {
+    sender,
+    receiver,
+    msg: message,
+    propertyId,
+    timestamp: new Date().toISOString(), // Add timestamp
+    read_receipt: false // Initialize read_receipt
+  };
 
-    // Send the message to the server with the required arguments
-    this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
+  // Send the message to the server with the required arguments
+  this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
 
-    // Add the message to the local messages array
-    this.messages.push(newMessage); // Add new messages to the end of the array
+  // Add the message to the local messages array
+  this.messages.push(newMessage); // Add new messages to the end of the array
 
-    // Clear the input field
-    this.message = '';
-    this.scrollToBottom();
-  }
+  // Clear the input field
+  this.message = '';
+  this.scrollToBottom();
+}
 }
