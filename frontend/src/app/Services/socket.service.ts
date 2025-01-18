@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {io, Socket} from 'socket.io-client';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -13,16 +13,20 @@ export class SocketService {
     this.socket = io('http://127.0.0.1:5000'); // Ensure this URL matches your backend server's address
   }
 
-  joinRoom(room: string, user: string) {
-    this.socket.emit('join', { room, user });
+  joinRoom(property_id: string, user: string) {
+    this.socket.emit('join', {room: property_id, user});
   }
 
-  leaveRoom(room: string, user: string) {
-    this.socket.emit('leave', { room, user });
+  leaveRoom(property_id: string, user: string) {
+    this.socket.emit('leave', {room: property_id, user});
+  }
+
+  getMessages(property_id: string): Observable<any> {
+    return this.http.get(`http://127.0.0.1:5000/messages/${property_id}`);
   }
 
   sendMessage(property_id: string, sender: string, receiver: string, message: string) {
-    this.socket.emit('message', { property_id, sender, receiver, msg: message });
+    this.socket.emit('message', {property_id, sender, receiver, msg: message});
   }
 
   onMessage(): Observable<any> {
@@ -39,9 +43,5 @@ export class SocketService {
         observer.next(data);
       });
     });
-  }
-
-  getMessages(room: string): Observable<any> {
-    return this.http.get(`http://127.0.0.1:5000/messages/${room}`);
   }
 }

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, make_response
 from flask_cors import CORS
+import bson
 from flask_socketio import SocketIO, Namespace, emit, join_room, leave_room
 from pymongo import MongoClient
 from datetime import datetime
@@ -56,12 +57,21 @@ socketio.on_namespace(ChatNamespace('/chat'))
 def index():
     return render_template('index.html')
 
-@app.route('/messages/<room>', methods=['GET'])
-def get_messages(room):
-    messages = list(messages_collection.find({'room': room}))
+@app.route('/messages/<property_id>', methods=['GET'])
+def get_messages(property_id):
+    try:
+        property_obj_id = ObjectId(property_id)
+    except bson.errors.InvalidId:
+        return jsonify({'error': 'Invalid property_id'}), 400
+
+    messages = messages_collection.find({'property_id': property_obj_id})
+    messages_list = []
     for message in messages:
         message['_id'] = str(message['_id'])
-    return jsonify(messages)
+        message['property_id'] = str(message['property_id'])
+        messages_list.append(message)
+
+    return make_response(jsonify(messages_list)), 200
 
 @app.route('/messages/read/<message_id>', methods=['POST'])
 def mark_message_as_read(message_id):

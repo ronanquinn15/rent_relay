@@ -31,6 +31,23 @@
 
 .chat-message {
   margin-bottom: 8px;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #888;
+}
+
+.timestamp {
+  font-style: italic;
+}
+
+.read-receipt {
+  color: green;
 }
 
 .chat-input {

@@ -26,6 +26,9 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.getProperties();
+    this.socketService.onMessage().subscribe((msg) => {
+      this.messages.push(msg);
+    });
   }
 
   getProperties(): void {
@@ -40,22 +43,32 @@ export class ChatComponent implements OnInit {
     );
   }
 
+  loadMessages(): void {
+    this.selectedProperty = '6776e3e94527ce5d8fbf7988';
+    if (this.selectedProperty) {
+      this.socketService.getMessages(this.selectedProperty).subscribe(
+        (data) => {
+          console.log('Fetched Messages:', data); // Log the fetched messages
+          this.messages = data;
+        },
+        (error) => {
+          console.error('Error fetching messages', error);
+        }
+      );
+    } else {
+      console.error('No property selected');
+    }
+  }
+
   onPropertySelect(): void {
-    this.selectedProperty = '6776e3e94527ce5d8fbf7988'; // Hard code the property ID
+    this.selectedProperty = '6776e3e94527ce5d8fbf7988';
     console.log('Selected Property ID:', this.selectedProperty); // Log the selected property ID
     if (this.selectedProperty) {
       this.userService.getPropertyById(this.selectedProperty).subscribe(
         (property) => {
           console.log('Fetched Property:', property); // Log the fetched property details
-          this.socketService.getMessages(this.selectedProperty).subscribe(
-            (data) => {
-              console.log('Fetched Messages:', data); // Log the fetched messages
-              this.messages = data;
-            },
-            (error) => {
-              console.error('Error fetching messages', error);
-            }
-          );
+          this.selectedProperty = property._id; // Ensure the property ID is an ObjectId
+          this.loadMessages();
         },
         (error) => {
           console.error('Error fetching property', error);
