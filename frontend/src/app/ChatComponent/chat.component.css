@@ -90,6 +90,10 @@
   color: ghostwhite;
 }
 
+.chat-message.receiver .timestamp {
+  color: black;
+}
+
 .read-receipt {
   color: white;
 }
