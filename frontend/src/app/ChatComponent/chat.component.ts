@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   properties: any[] = [];
   selectedProperty: string = '';
   messages: any[] = [];
+  unreadMessages: number = 0;
   message: string = '';
   userRole: string = '';
 
@@ -36,17 +37,29 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       this.getProperties();
       this.socketService.onMessage().subscribe((msg) => {
         this.messages.push(msg); // Add new messages to the end of the array
-        this.markAsRead(msg._id);
+        this.markAsRead(msg._id, msg.sender);
         this.scrollToBottom();
+        this.updateUnreadCount();
       });
     } else if (this.userRole === 'tenant') {
       this.fetchMessagesForTenant();
       this.socketService.onMessage().subscribe((msg) => {
         this.messages.push(msg); // Add new messages to the end of the array
-        this.markAsRead(msg._id);
+        this.markAsRead(msg._id, msg.sender);
         this.scrollToBottom();
+        this.updateUnreadCount();
       });
     }
+    this.updateUnreadCount();
+  }
+
+  updateUnreadCount(): void {
+  const loggedInUser = this.userService.getLoggedInUser();
+  this.unreadMessages = this.messages.filter((msg) => !msg.read_receipt && msg.sender !== loggedInUser).length;
+}
+
+  getFirstUnreadMessageIndex(): number {
+    return this.messages.findIndex((msg) => !msg.read_receipt);
   }
 
   ngAfterViewChecked(): void {
@@ -61,9 +74,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  markAsRead(messageId: string): void {
+  markAsRead(messageId: string, sender: string): void {
+  const loggedInUser = this.userService.getLoggedInUser();
+  if (loggedInUser !== sender) {
     this.socketService.updateReadStatus(messageId);
   }
+}
 
   fetchMessagesForTenant(): void {
     this.userService.getTenantPropertyID().subscribe(
@@ -72,8 +88,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
           this.socketService.getMessages(tenantPropertyId).subscribe(
             (messages) => {
               this.messages = messages; // Keep the order of messages
-              messages.forEach((msg: any) => this.markAsRead(msg._id)); // Mark each message as read
+              messages.forEach((msg: any) => this.markAsRead(msg._id, msg.sender)); // Mark each message as read
               this.scrollToBottom();
+              this.updateUnreadCount();
             },
             (error) => {
               console.error('Error fetching messages for tenant', error);
@@ -107,8 +124,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         (data) => {
           console.log('Fetched Messages:', data); // Log the fetched messages
           this.messages = data; // Keep the order of messages
-          data.forEach((msg: any) => this.markAsRead(msg._id)); // Mark each message as read
+          data.forEach((msg: any) => this.markAsRead(msg._id, msg.sender)); // Mark each message as read
           this.scrollToBottom();
+          this.updateUnreadCount();
         },
         (error) => {
           console.error('Error fetching messages', error);
@@ -143,23 +161,24 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   private sendMessageToServer(propertyId: string, sender: string, receiver: string, message: string): void {
-  const newMessage = {
-    sender,
-    receiver,
-    msg: message,
-    propertyId,
-    timestamp: new Date().toISOString(), // Add timestamp
-    read_receipt: false // Initialize read_receipt
-  };
+    const newMessage = {
+      sender,
+      receiver,
+      msg: message,
+      propertyId,
+      timestamp: new Date().toISOString(), // Add timestamp
+      read_receipt: false // Initialize read_receipt
+    };
 
-  // Send the message to the server with the required arguments
-  this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
+    // Send the message to the server with the required arguments
+    this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
 
-  // Add the message to the local messages array
-  this.messages.push(newMessage); // Add new messages to the end of the array
+    // Add the message to the local messages array
+    this.messages.push(newMessage); // Add new messages to the end of the array
 
-  // Clear the input field
-  this.message = '';
-  this.scrollToBottom();
-}
+    // Clear the input field
+    this.message = '';
+    this.scrollToBottom();
+    this.updateUnreadCount();
+  }
 }

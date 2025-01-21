@@ -1,6 +1,7 @@
 <div class="chat-container">
   <header class="chat-header">
     <h2>Chat Room</h2>
+    <p>Unread Messages: {{ unreadMessages }}</p>
   </header>
 
   <!-- Landlord's HTML -->
@@ -23,7 +24,10 @@
   </ng-container>
 
   <section class="chat-messages" #chatMessages>
-  <div *ngFor="let msg of messages" class="chat-message" [ngClass]="{'sender': msg.sender === userService.getLoggedInUser(), 'receiver': msg.sender !== userService.getLoggedInUser()}">
+  <div *ngFor="let msg of messages; let i = index" class="chat-message" [ngClass]="{'sender': msg.sender === userService.getLoggedInUser(), 'receiver': msg.sender !== userService.getLoggedInUser()}">
+    <div *ngIf="i === getFirstUnreadMessageIndex() && userService.getLoggedInUser() !== msg.sender && unreadMessages > 0" class="new-messages-indicator">
+      <p>New Messages:</p>
+    </div>
     <p><strong>{{ msg.sender }}:</strong> {{ msg.msg }}</p>
     <p class="message-meta">
       <span class="timestamp">{{ msg.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
