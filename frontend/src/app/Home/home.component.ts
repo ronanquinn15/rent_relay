@@ -22,6 +22,7 @@ export class HomeComponent implements OnInit {
   tenantProperty: any = {};
   tenantInfo: any = {};
   landlordInfo: any = {};
+  isLoggedIn: boolean = false;
 
   headings: ColDef[] = [
     { field: "address" },
@@ -59,6 +60,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.isLoggedIn = this.authService.isLoggedIn(); // Add this line
     this.userRole = this.authService.getUserRole();
     if (this.userRole === 'landlord') {
       this.loadLandlordInfo();
