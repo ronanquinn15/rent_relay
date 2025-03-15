@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, make_response
 from flask_cors import CORS
 import bson
-from flask_socketio import SocketIO, Namespace, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from datetime import datetime
 from blueprints.auth.auth import auth_bp
