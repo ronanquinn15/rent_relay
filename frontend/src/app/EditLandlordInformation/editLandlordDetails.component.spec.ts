@@ -45,6 +45,10 @@ describe('EditLandlordDetailsComponent', () => {
     fixture.detectChanges();
   });
 
+  it('should create the component', () => {
+    expect(component).toBeTruthy();
+  });
+
   it('should not call updateLandlordInfo if form is invalid', () => {
     component.landlordForm.setValue({
       name: '',
