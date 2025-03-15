@@ -5,7 +5,11 @@
       <h2 class="card-title">About Rent Relay</h2>
     </div>
     <div class="card-body">
-      <p>Rent Relay is a tenant-landlord communication platform designed to streamline interactions and improve property management efficiency. The platform addresses common challenges in the rental market, such as delayed maintenance responses and unclear communication. By offering tools like real-time messaging, maintenance request tracking, and a centralized dashboard, Rent Relay bridges the gap between tenants and landlords, ensuring transparency, accountability, and user satisfaction.</p>
+      <p>Rent Relay is a tenant-landlord communication platform designed to streamline interactions and improve property
+        management efficiency. The platform addresses common challenges in the rental market, such as delayed
+        maintenance responses and unclear communication. By offering tools like real-time messaging, maintenance request
+        tracking, and a centralized dashboard, Rent Relay bridges the gap between tenants and landlords, ensuring
+        transparency, accountability, and user satisfaction.</p>
     </div>
   </div>
   <div class="card shadow-lg mb-4">
@@ -14,13 +18,17 @@
     </div>
     <div class="card-body">
       <h5>Tailored for the Rental Market</h5>
-      <p>Unlike generic property management tools, Rent Relay is specifically designed for the tenant-landlord relationship, making it more focused and effective. <br> </p>
+      <p>Unlike generic property management tools, Rent Relay is specifically designed for the tenant-landlord
+        relationship, making it more focused and effective. <br></p>
       <h5>Enhanced Communication</h5>
-      <p>Real-time messaging and maintenance request tracking improve communication between tenants and landlords, reducing delays and misunderstandings. <br> </p>
+      <p>Real-time messaging and maintenance request tracking improve communication between tenants and landlords,
+        reducing delays and misunderstandings. <br></p>
       <h5>User Benefits</h5>
-      <p>Tenants enjoy faster maintenance responses and transparent updates, while landlords benefit from an organised system for managing requests. <br> </p>
+      <p>Tenants enjoy faster maintenance responses and transparent updates, while landlords benefit from an organised
+        system for managing requests. <br></p>
       <h5>Cost-Effective Solution</h5>
-      <p>Rent Relay offers essential functionalities at an affordable price, making it a cost-effective solution for rental property management.</p>
+      <p>Rent Relay offers essential functionalities at an affordable price, making it a cost-effective solution for
+        rental property management.</p>
     </div>
   </div>
   <div class="card shadow-lg mb-4">
@@ -28,7 +36,12 @@
       <h2 class="card-title">How It Works</h2>
     </div>
     <div class="card-body">
-      <p>Rent Relay operates through a user-friendly web application that enables tenants and landlords to create accounts and manage their respective roles. Tenants can submit detailed maintenance requests, including urgency levels and a maintenance issue description, which landlords can view, prioritise, and address. A real-time messaging system facilitates direct communication, while notifications keep users informed of updates. The platform’s backend, built using Python (Flask) and MongoDB, ensures secure data storage and efficient handling of user interactions, while the frontend offers an intuitive interface for seamless navigation.</p>
+      <p>Rent Relay operates through a user-friendly web application that enables tenants and landlords to create
+        accounts and manage their respective roles. Tenants can submit detailed maintenance requests, including urgency
+        levels and a maintenance issue description, which landlords can view, prioritise, and address. A real-time
+        messaging system facilitates direct communication, while notifications keep users informed of updates. The
+        platform’s backend, built using Python (Flask) and MongoDB, ensures secure data storage and efficient handling
+        of user interactions, while the frontend offers an intuitive interface for seamless navigation.</p>
     </div>
   </div>
   <div class="card shadow-lg mb-4">
@@ -36,7 +49,12 @@
       <h2 class="card-title">Benefits</h2>
     </div>
     <div class="card-body">
-      <p>Rent Relay provides several benefits for both tenants and landlords. Tenants gain peace of mind with faster response times and transparent updates on maintenance issues. Landlords benefit from an organised system for managing requests, reducing delays, and fostering better relationships with tenants. The platform’s real-time communication enhance responsiveness and accountability. Additionally, its intuitive design and focus on essential functionalities make it a cost-effective solution for improving rental management efficiency while addressing the needs of both parties.</p>
+      <p>Rent Relay provides several benefits for both tenants and landlords. Tenants gain peace of mind with faster
+        response times and transparent updates on maintenance issues. Landlords benefit from an organised system for
+        managing requests, reducing delays, and fostering better relationships with tenants. The platform’s real-time
+        communication enhance responsiveness and accountability. Additionally, its intuitive design and focus on
+        essential functionalities make it a cost-effective solution for improving rental management efficiency while
+        addressing the needs of both parties.</p>
     </div>
   </div>
   <div class="card shadow-lg mb-4">
@@ -45,13 +63,17 @@
     </div>
     <div class="card-body">
       <h5>Real-Time Messaging</h5>
-      <p>Tenants and landlords can communicate instantly, addressing issues faster and improving transparency, resulting in reduced delays and no misunderstandings! <br> </p>
+      <p>Tenants and landlords can communicate instantly, addressing issues faster and improving transparency, resulting
+        in reduced delays and no misunderstandings! <br></p>
       <h5>Maintenance Request Tracking</h5>
-      <p>Tenants can submit maintenance requests with details like urgency levels and descriptions, allowing landlords to prioritise and address issues efficiently. <br> </p>
+      <p>Tenants can submit maintenance requests with details like urgency levels and descriptions, allowing landlords
+        to prioritise and address issues efficiently. <br></p>
       <h5>Centralised Dashboard</h5>
-      <p>Users can access a centralised dashboard to view all their property and account information, making it easier to manage their rental properties. <br> </p>
+      <p>Users can access a centralised dashboard to view all their property and account information, making it easier
+        to manage their rental properties. <br></p>
       <h5>User Friendly Design</h5>
-      <p>The platform offers an intuitive interface for seamless navigation, ensuring that users can easily access the tools they need to manage their properties.</p>
+      <p>The platform offers an intuitive interface for seamless navigation, ensuring that users can easily access the
+        tools they need to manage their properties.</p>
     </div>
   </div>
 </div>
@@ -78,6 +100,27 @@
     [columnDefs]="headings"
     [gridOptions]="gridOptions">
   </ag-grid-angular>
+
+  <h1 style="margin-top: 20px">Property Analytics</h1>
+
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-lg h-100">
+        <div class="card-header bg-primary text-white">
+          <h3>Properties by City</h3>
+        </div>
+        <div class="card-body d-flex justify-content-center align-items-center">
+          <div style="height: 400px; width: 100%;">
+            <ag-charts [options]="cityDistributionChartOptions" class="w-100"></ag-charts>
+          </div>
+        </div>
+        <div class="card-footer bg-light">
+          <small class="text-muted">Distribution of properties across different cities</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div *ngIf="userRole === 'tenant'" class="container" style="margin-top: 70px">
@@ -117,7 +160,8 @@
   <div class="card shadow-lg">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <h2 class="card-title">Landlord Information</h2>
-      <span class="badge badge-light" *ngIf="tenantProperty.landlord_id">Landlord ID: {{ tenantProperty.landlord_id }}</span>
+      <span class="badge badge-light"
+            *ngIf="tenantProperty.landlord_id">Landlord ID: {{ tenantProperty.landlord_id }}</span>
     </div>
     <div class="card-body" *ngIf="tenantProperty.landlord_details; else noLandlord">
       <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ tenantProperty.landlord_details?.name }}</p>

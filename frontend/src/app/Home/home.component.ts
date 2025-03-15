@@ -23,6 +23,7 @@ export class HomeComponent implements OnInit {
   tenantInfo: any = {};
   landlordInfo: any = {};
   isLoggedIn: boolean = false;
+  cityDistributionChartOptions: AgChartOptions = {};
 
   headings: ColDef[] = [
     { field: "address" },
@@ -44,6 +45,40 @@ export class HomeComponent implements OnInit {
     },
     domLayout: 'autoHeight' as 'autoHeight',
   };
+
+  // Initialize pie chart for property distribution by city
+  initCityDistributionChart(): void {
+    // Group properties by city and count them
+  const cityDistribution = this.data.reduce((acc, property) => {
+    if (!acc[property.city]) {
+      acc[property.city] = 0;
+    }
+    acc[property.city]++;
+    return acc;
+  }, {});
+
+  // Transform data for the pie chart
+  const cityChartData = Object.keys(cityDistribution).map(city => ({
+    city: city,
+    count: cityDistribution[city]
+  }));
+
+  this.cityDistributionChartOptions = {
+    title: {
+      text: 'Properties by City',
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    data: cityChartData,
+    series: [{
+      type: 'pie',
+      angleKey: 'count',
+      calloutLabelKey: 'city',
+      sectorLabelKey: 'count',
+      fills: ['#7CB5EC', '#90ED7D', '#F7A35C', '#8085E9', '#F15C80'],
+    }],
+  };
+}
 
   constructor(private webService: WebService, private authService: AuthService, private router: Router) { }
 
@@ -74,6 +109,7 @@ export class HomeComponent implements OnInit {
   loadProperties(): void {
     this.webService.getProperties().subscribe((resp) => {
       this.data = resp;
+      this.initCityDistributionChart();
     });
   }
 
