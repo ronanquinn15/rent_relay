@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
   landlordInfo: any = {};
   isLoggedIn: boolean = false;
   cityDistributionChartOptions: AgChartOptions = {};
+  bathroomDistributionChartOptions: AgChartOptions = {};
 
   headings: ColDef[] = [
     { field: "address" },
@@ -79,6 +80,41 @@ export class HomeComponent implements OnInit {
     }],
   };
 }
+initBathroomDistributionChart(): void {
+  // Group properties by bathroom count
+  const bathroomDistribution = this.data.reduce((acc, property) => {
+    const bathrooms = property.number_of_bathrooms;
+    if (!acc[bathrooms]) {
+      acc[bathrooms] = 0;
+    }
+    acc[bathrooms]++;
+    return acc;
+  }, {});
+
+  // Transform data for the bar chart
+  const bathroomChartData = Object.keys(bathroomDistribution)
+    .sort((a, b) => Number(a) - Number(b))
+    .map(bathrooms => ({
+      bathrooms: bathrooms + (Number(bathrooms) === 1 ? ' Bathroom' : ' Bathrooms'),
+      count: bathroomDistribution[bathrooms]
+    }));
+
+  this.bathroomDistributionChartOptions = {
+    title: {
+      text: 'Properties by Bathroom Count',
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    data: bathroomChartData,
+    series: [{
+      type: 'bar' as any,
+      xKey: 'bathrooms',
+      yKey: 'count',
+      fills: ['#8085E9'],
+    }],
+  };
+}
+
 
   constructor(private webService: WebService, private authService: AuthService, private router: Router) { }
 
@@ -110,6 +146,7 @@ export class HomeComponent implements OnInit {
     this.webService.getProperties().subscribe((resp) => {
       this.data = resp;
       this.initCityDistributionChart();
+      this.initBathroomDistributionChart();
     });
   }
 

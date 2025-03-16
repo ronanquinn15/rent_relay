@@ -104,22 +104,37 @@
   <h1 style="margin-top: 20px">Property Analytics</h1>
 
   <div class="row">
-    <div class="col-lg-6 mb-4">
-      <div class="card shadow-lg h-100">
-        <div class="card-header bg-primary text-white">
-          <h3>Properties by City</h3>
+  <div class="col-lg-6 mb-4">
+    <div class="card shadow-lg h-100">
+      <div class="card-header bg-primary text-white">
+        <h3>Properties by City</h3>
+      </div>
+      <div class="card-body d-flex justify-content-center align-items-center">
+        <div style="height: 400px; width: 100%;">
+          <ag-charts [options]="cityDistributionChartOptions" class="w-100"></ag-charts>
         </div>
-        <div class="card-body d-flex justify-content-center align-items-center">
-          <div style="height: 400px; width: 100%;">
-            <ag-charts [options]="cityDistributionChartOptions" class="w-100"></ag-charts>
-          </div>
-        </div>
-        <div class="card-footer bg-light">
-          <small class="text-muted">Distribution of properties across different cities</small>
-        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <small class="text-muted">Distribution of properties across different cities</small>
       </div>
     </div>
   </div>
+    <div class="col-lg-6 mb-4">
+    <div class="card shadow-lg h-100">
+      <div class="card-header bg-primary text-white">
+        <h3>Average Rent by Bedroom Count</h3>
+      </div>
+      <div class="card-body d-flex justify-content-center align-items-center">
+        <div style="height: 400px; width: 100%;">
+          <ag-charts [options]="bathroomDistributionChartOptions" class="w-100"></ag-charts>
+        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <small class="text-muted">Shows the relationship between bedroom count and average rent</small>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 
