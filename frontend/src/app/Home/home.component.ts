@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
   landlordInfo: any = {};
   isLoggedIn: boolean = false;
   cityDistributionChartOptions: AgChartOptions = {};
-  bathroomDistributionChartOptions: AgChartOptions = {};
+  cityRentDistributionChartOptions: AgChartOptions = {};
 
   headings: ColDef[] = [
     { field: "address" },
@@ -47,70 +47,77 @@ export class HomeComponent implements OnInit {
     domLayout: 'autoHeight' as 'autoHeight',
   };
 
-  // Initialize pie chart for property distribution by city
+  // Initialise pie chart for property distribution by city
   initCityDistributionChart(): void {
     // Group properties by city and count them
-  const cityDistribution = this.data.reduce((acc, property) => {
+    const cityDistribution = this.data.reduce((acc, property) => {
+      if (!acc[property.city]) {
+        acc[property.city] = 0;
+      }
+      acc[property.city]++;
+      return acc;
+    }, {});
+
+    // Transform data for the pie chart
+    const cityChartData = Object.keys(cityDistribution).map(city => ({
+      city: city,
+      count: cityDistribution[city]
+    }));
+
+    this.cityDistributionChartOptions = {
+      title: {
+        text: 'Properties by City',
+        fontSize: 18,
+        fontWeight: 'bold',
+      },
+      data: cityChartData,
+      series: [{
+        type: 'pie',
+        angleKey: 'count',
+        calloutLabelKey: 'city',
+        sectorLabelKey: 'count',
+        fills: ['#7CB5EC', '#90ED7D', '#F7A35C', '#8085E9', '#F15C80'],
+      }],
+    };
+  }
+
+  initCityRentDistributionChart(): void {
+  // Create an object to store both the sum of rent and count of properties by city
+  const cityData = this.data.reduce((acc, property) => {
     if (!acc[property.city]) {
-      acc[property.city] = 0;
+      acc[property.city] = {
+        totalRent: 0,
+        propertyCount: 0
+      };
     }
-    acc[property.city]++;
+    // Ensure rent is a number
+    const rentValue = typeof property.rent === 'string' ? parseFloat(property.rent) : property.rent;
+    acc[property.city].totalRent += rentValue;
+    acc[property.city].propertyCount++;
     return acc;
   }, {});
 
-  // Transform data for the pie chart
-  const cityChartData = Object.keys(cityDistribution).map(city => ({
+  // Calculate the average rent for each city
+  const cityChartData = Object.keys(cityData).map(city => ({
     city: city,
-    count: cityDistribution[city]
+    avgRent: Math.round(cityData[city].totalRent / cityData[city].propertyCount),
+    // Add a formatted version for display
+    label: `£${Math.round(cityData[city].totalRent / cityData[city].propertyCount).toLocaleString()}`
   }));
 
-  this.cityDistributionChartOptions = {
+  this.cityRentDistributionChartOptions = {
     title: {
-      text: 'Properties by City',
+      text: 'Average Rent by City',
       fontSize: 18,
       fontWeight: 'bold',
     },
     data: cityChartData,
     series: [{
       type: 'pie',
-      angleKey: 'count',
+      angleKey: 'avgRent',
       calloutLabelKey: 'city',
-      sectorLabelKey: 'count',
+      sectorLabelKey: 'label',
       fills: ['#7CB5EC', '#90ED7D', '#F7A35C', '#8085E9', '#F15C80'],
-    }],
-  };
-}
-initBathroomDistributionChart(): void {
-  // Group properties by bathroom count
-  const bathroomDistribution = this.data.reduce((acc, property) => {
-    const bathrooms = property.number_of_bathrooms;
-    if (!acc[bathrooms]) {
-      acc[bathrooms] = 0;
-    }
-    acc[bathrooms]++;
-    return acc;
-  }, {});
-
-  // Transform data for the bar chart
-  const bathroomChartData = Object.keys(bathroomDistribution)
-    .sort((a, b) => Number(a) - Number(b))
-    .map(bathrooms => ({
-      bathrooms: bathrooms + (Number(bathrooms) === 1 ? ' Bathroom' : ' Bathrooms'),
-      count: bathroomDistribution[bathrooms]
-    }));
-
-  this.bathroomDistributionChartOptions = {
-    title: {
-      text: 'Properties by Bathroom Count',
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    data: bathroomChartData,
-    series: [{
-      type: 'bar' as any,
-      xKey: 'bathrooms',
-      yKey: 'count',
-      fills: ['#8085E9'],
     }],
   };
 }
@@ -146,7 +153,7 @@ initBathroomDistributionChart(): void {
     this.webService.getProperties().subscribe((resp) => {
       this.data = resp;
       this.initCityDistributionChart();
-      this.initBathroomDistributionChart();
+      this.initCityRentDistributionChart();
     });
   }
 

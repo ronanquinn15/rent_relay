@@ -122,15 +122,15 @@
     <div class="col-lg-6 mb-4">
     <div class="card shadow-lg h-100">
       <div class="card-header bg-primary text-white">
-        <h3>Average Rent by Bedroom Count</h3>
+        <h3>Average Rent by City</h3>
       </div>
       <div class="card-body d-flex justify-content-center align-items-center">
         <div style="height: 400px; width: 100%;">
-          <ag-charts [options]="bathroomDistributionChartOptions" class="w-100"></ag-charts>
+          <ag-charts [options]="cityRentDistributionChartOptions" class="w-100"></ag-charts>
         </div>
       </div>
       <div class="card-footer bg-light">
-        <small class="text-muted">Shows the relationship between bedroom count and average rent</small>
+        <small class="text-muted">Shows the relationship between cities and average rent amount</small>
       </div>
     </div>
   </div>
