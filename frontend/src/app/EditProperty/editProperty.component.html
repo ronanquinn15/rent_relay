@@ -50,6 +50,9 @@
             <input type="text" class="form-control" id="tenant_id" [(ngModel)]="property.tenant_id" name="tenant_id" required>
           </div>
         </fieldset>
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
         <button type="submit" class="btn btn-primary w-100">Update Property</button>
       </form>
     </div>

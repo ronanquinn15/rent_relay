@@ -17,6 +17,7 @@ export class EditMaintenanceComponent implements OnInit {
   maintenanceForm: FormGroup;
   maintenanceId: string = '';
   maintenanceRequest: any;
+  errorMessage: string = '';
 
   constructor(
     private webService: WebService,
@@ -51,7 +52,13 @@ export class EditMaintenanceComponent implements OnInit {
       };
       this.webService.updateMaintenanceRequest(this.maintenanceId, updatedRequest).subscribe(() => {
         this.router.navigate(['/maintenance']);
+      }, error => {
+        console.error('Error updating maintenance request', error);
+        this.errorMessage = 'Failed to update maintenance request. Please try again.';
       });
+    } else {
+      console.error('Form is invalid', this.maintenanceForm);
+      this.errorMessage = 'Please complete the required fields.';
     }
   }
 }
