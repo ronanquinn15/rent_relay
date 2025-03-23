@@ -1,0 +1,42 @@
+/* Fix for the button.btn.btn-outline-light contrast issue */
+.btn-outline-light {
+  /* Change from outline to solid for better contrast */
+  background-color: #ffffff !important;
+  color: #0d6efd !important; /* Dark blue text on white background */
+  border: 2px solid #ffffff !important;
+  font-weight: 600;
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus {
+  background-color: #e6e6e6 !important; /* Slightly darker white on hover */
+  color: #0a58ca !important; /* Darker blue on hover */
+  border-color: #e6e6e6 !important;
+}
+
+/* Fix for navbar background contrast */
+.navbar.bg-primary {
+  /* Use a darker shade of blue for better contrast with white text */
+  background-color: #0a4285 !important; /* Darker than Bootstrap's default primary */
+}
+
+/* Ensure search button has sufficient contrast */
+.navbar .btn-outline-light {
+  border-width: 2px;
+  font-weight: 600;
+}
+
+/* Ensure all navbar text has sufficient contrast */
+.navbar-dark .navbar-nav .nav-link,
+.navbar-dark .navbar-brand,
+.navbar .high-contrast {
+  color: #ffffff !important;
+  font-weight: 600; /* Slightly bolder for better readability */
+}
+
+/* Fix any badges in the navbar */
+.navbar .badge {
+  color: #0a4285 !important; /* Dark text */
+  background-color: #ffffff !important; /* White background */
+  font-weight: 600;
+}
