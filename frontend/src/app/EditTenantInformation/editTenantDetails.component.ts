@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class EditTenantDetailsComponent implements OnInit {
   tenantForm: FormGroup;
   tenantId: string = '';
+  errorMessage: string = '';
 
   constructor(private webService: WebService, private route: ActivatedRoute, private router: Router) {
     this.tenantForm = new FormGroup({
@@ -47,7 +48,12 @@ export class EditTenantDetailsComponent implements OnInit {
         this.router.navigate(['/']);
       }, error => {
         console.error('Error updating tenant details', error);
+        this.errorMessage = 'Failed to update tenant details. Please try again.';
       });
+    }
+    else {
+      console.error('Form is invalid', this.tenantForm);
+      this.errorMessage = 'Please fill out all required fields.';
     }
   }
 }

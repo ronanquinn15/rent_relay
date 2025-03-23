@@ -30,6 +30,9 @@
           <label for="password" class="form-label">Password</label>
           <input id="password" formControlName="password" class="form-control" type="password">
         </div>
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
         <button type="submit" class="btn btn-primary" [disabled]="tenantForm.invalid">Submit</button>
       </form>
     </div>
