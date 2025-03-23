@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { WebService } from '../Services/web.service';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-add-property',
@@ -9,12 +10,13 @@ import { WebService } from '../Services/web.service';
   styleUrls: ['./addProperty.component.css'],
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule, CommonModule
   ],
   providers: [WebService]
 })
 export class AddPropertyComponent {
   addPropertyForm: FormGroup;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -35,14 +37,15 @@ export class AddPropertyComponent {
 
   onSubmit() {
     if (this.addPropertyForm.valid) {
-      console.log(this.addPropertyForm.value); // Log form data
       this.webService.addProperty(this.addPropertyForm.value).subscribe(() => {
         this.router.navigate(['/landlords/properties']);
       }, (error) => {
         console.error('Error adding property', error);
+        this.errorMessage = 'Failed to add property. Please try again.'; // Set error message
       });
     } else {
       console.error('Form is invalid', this.addPropertyForm);
+      this.errorMessage = 'Please fill out all required fields.'; // Set error message
     }
   }
 }

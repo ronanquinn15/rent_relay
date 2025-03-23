@@ -46,6 +46,9 @@
             <input id="tenant_id" formControlName="tenant_id" class="form-control" />
           </div>
         </fieldset>
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
         <button type="submit" class="btn btn-primary w-100">Add Property</button>
       </form>
     </div>

@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./userAuth.component.css'],
   standalone: true,
   providers: [WebService, AsyncPipe, CommonModule],
-  imports: [FormsModule]
+  imports: [FormsModule, CommonModule]
 })
 export class UserAuthComponent {
   username: string = '';
   password: string = '';
+  errorMessage: string = '';
 
   constructor(private webService: WebService) { }
 
@@ -29,6 +30,7 @@ export class UserAuthComponent {
       },
       error => {
         console.error('Failed to Login', error);
+        this.errorMessage = 'Username or Password is incorrect';
       }
     );
   }
