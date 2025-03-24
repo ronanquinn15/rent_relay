@@ -81,7 +81,7 @@ def create_maintenance_request():
         'request_date': datetime.datetime.now().strftime('%d-%m-%Y'),
         'status': False,
     }
-    new_request_id = maintenance.insert_one(new_request)
+    new_request_id = maintenance.insert_one(new_request).inserted_id
     return make_response(jsonify({'message': 'Maintenance request created', 'request_id': str(new_request_id)}), 201)
 
 @maintenance_bp.route('/api/maintenance', methods=['GET'])
