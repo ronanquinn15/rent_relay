@@ -2,18 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { WebService } from '../Services/web.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-property',
   templateUrl: './properties.component.html',
   styleUrls: ['./properties.component.css'],
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, FormsModule],
   providers: [WebService],
   standalone: true
 })
 export class PropertiesComponent implements OnInit {
   properties: any = [];
   filteredProperties: any = [];
+  searchTerm: string = '';
 
   // Pagination properties
   currentPage: number = 1;
@@ -42,6 +44,15 @@ export class PropertiesComponent implements OnInit {
 
   changePage(page: number) {
     this.currentPage = page;
+  }
+
+  // Search method
+  searchProperties() {
+    this.filteredProperties = this.properties.filter((prop: any) =>
+      prop.address.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+    this.totalItems = this.filteredProperties.length;
+    this.currentPage = 1; // Reset to first page
   }
 
   protected readonly Math = Math;
