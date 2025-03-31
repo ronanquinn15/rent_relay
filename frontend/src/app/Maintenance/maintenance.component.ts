@@ -15,7 +15,9 @@ import { AuthService } from '../Services/authService.service';
 
 export class MaintenanceComponent implements OnInit {
   maintenanceRequests: any = [];
+  filteredRequests: any = [];
   userRole: string = '';
+  filterStatus: string = 'all';
 
   constructor(private webService: WebService, private authService: AuthService) { }
 
@@ -24,11 +26,23 @@ export class MaintenanceComponent implements OnInit {
     if (this.userRole === 'landlord') {
       this.webService.getMaintenanceRequests().subscribe((resp) => {
         this.maintenanceRequests = resp;
+        this.filteredRequests = resp;
       });
     } else if (this.userRole === 'tenant') {
       this.webService.getMaintenanceRequestsRelatedToTenant().subscribe((resp) => {
         this.maintenanceRequests = resp;
+        this.filteredRequests = resp;
       });
+    }
+  }
+
+  filterRequests(status: string) {
+    this.filterStatus = status;
+    if (status === 'all') {
+      this.filteredRequests = this.maintenanceRequests;
+    } else {
+      const isCompleted = status === 'completed';
+      this.filteredRequests = this.maintenanceRequests.filter((request: any) => request.status === isCompleted);
     }
   }
 

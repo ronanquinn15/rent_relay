@@ -28,8 +28,13 @@
         </ng-template>
       </div>
       <div *ngIf="userRole === 'tenant'">
-        <div *ngIf="maintenanceRequests.length > 0; else noRequests">
-          <div *ngFor="let request of maintenanceRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
+        <div class="mb-3 text-center">
+          <button class="btn btn-outline-primary me-2" (click)="filterRequests('all')" [class.active]="filterStatus === 'all'">All</button>
+          <button class="btn btn-outline-primary me-2" (click)="filterRequests('completed')" [class.active]="filterStatus === 'completed'">Completed</button>
+          <button class="btn btn-outline-primary" (click)="filterRequests('pending')" [class.active]="filterStatus === 'pending'">Pending</button>
+        </div>
+        <div *ngIf="filteredRequests.length > 0; else noRequests">
+          <div *ngFor="let request of filteredRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
             <div class="card-header bg-primary text-white">
               <h5 class="mb-0">Request ID: {{ request._id }}</h5>
             </div>
