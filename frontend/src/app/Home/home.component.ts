@@ -138,7 +138,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoggedIn = this.authService.isLoggedIn(); // Add this line
+    this.isLoggedIn = this.authService.isLoggedIn();
     this.userRole = this.authService.getUserRole();
     if (this.userRole === 'landlord') {
       this.loadLandlordInfo();

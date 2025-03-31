@@ -167,14 +167,14 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       msg: message,
       propertyId,
       timestamp: new Date().toISOString(), // Add timestamp
-      read_receipt: false // Initialize read_receipt
+      read_receipt: false // Initialise read_receipt
     };
 
     // Send the message to the server with the required arguments
     this.socketService.sendMessage(newMessage.propertyId, newMessage.sender, receiver, newMessage.msg);
 
     // Add the message to the local messages array
-    this.messages.push(newMessage); // Add new messages to the end of the array
+    this.messages.push(newMessage);
 
     // Clear the input field
     this.message = '';

@@ -27,36 +27,6 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client['rentRelayDB']
 messages_collection = db['messages']
 
-# class ChatNamespace(Namespace):
-#     def on_join(self, data):
-#         room = data['property_id']
-#         join_room(room)
-#         emit('status', {'msg': f'{data["user"]} has entered the room.'}, room=room)
-#
-#     def on_leave(self, data):
-#         room = data['property_id']
-#         leave_room(room)
-#         emit('status', {'msg': f'{data["user"]} has left the room.'}, room=room)
-#
-#     def on_message(self, data):
-#         room = data['property_id']
-#         message = {
-#             'room': room,
-#             'sender': data['sender'],
-#             'receiver': data['receiver'],
-#             'msg': data['msg'],
-#             'timestamp': datetime.utcnow(),
-#             'read_receipt': False
-#         }
-#         messages_collection.insert_one(message)
-#         emit('message', message, room=room)
-#
-# socketio.on_namespace(ChatNamespace('/chat'))
-#
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
 @app.route('/messages/<property_id>', methods=['GET'])
 def get_messages(property_id):
     try:

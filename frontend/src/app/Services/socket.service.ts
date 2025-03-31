@@ -10,7 +10,7 @@ export class SocketService {
   private socket: Socket;
 
   constructor(private http: HttpClient) {
-    this.socket = io('http://127.0.0.1:5000'); // Ensure this URL matches your backend server's address
+    this.socket = io('http://127.0.0.1:5000');
   }
 
   joinRoom(property_id: string, user: string) {

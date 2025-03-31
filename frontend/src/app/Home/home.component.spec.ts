@@ -69,13 +69,6 @@ describe('HomeComponent', () => {
     expect(component.userRole).toBe('landlord');
   });
 
-  // it('should load tenant info and property if userRole is tenant', () => {
-  //   authService.getUserRole.and.returnValue('tenant');
-  //   component.ngOnInit();
-  //   expect(component.loadTenantInfo).toHaveBeenCalled();
-  //   expect(component.loadTenantProperty).toHaveBeenCalled();
-  // });
-
   it('should navigate to tenant edit page on editTenant call', () => {
     component.editTenant();
     expect(router.navigate).toHaveBeenCalledWith(['tenant-details/edit']);
@@ -119,32 +112,4 @@ describe('HomeComponent', () => {
       city: 'Sample City'
     });
   });
-
-  // it('should display error message if getTenantInfo fails', () => {
-  //   spyOn(console, 'error');
-  //   webService.getTenantInfo.and.returnValue(throwError('Error'));
-  //   component.loadTenantInfo();
-  //   expect(console.error).toHaveBeenCalledWith('Error loading tenant details', 'Error');
-  // });
-  //
-  // it('should display error message if getLandlordInfo fails', () => {
-  //   spyOn(console, 'error');
-  //   webService.getLandlordInfo.and.returnValue(throwError('Error'));
-  //   component.loadLandlordInfo();
-  //   expect(console.error).toHaveBeenCalledWith('Error loading landlord details', 'Error');
-  // });
-  //
-  // it('should display error message if getProperties fails', () => {
-  //   spyOn(console, 'error');
-  //   webService.getProperties.and.returnValue(throwError('Error'));
-  //   component.loadProperties();
-  //   expect(console.error).toHaveBeenCalledWith('Error loading properties', 'Error');
-  // });
-  //
-  // it('should display error message if getPropertyRelatedToTenant fails', () => {
-  //   spyOn(console, 'error');
-  //   webService.getPropertyRelatedToTenant.and.returnValue(throwError('Error'));
-  //   component.loadTenantProperty();
-  //   expect(console.error).toHaveBeenCalledWith('Error loading tenant property', 'Error');
-  // });
 });
