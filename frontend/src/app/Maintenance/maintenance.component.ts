@@ -3,13 +3,14 @@ import { WebService } from '../Services/web.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../Services/authService.service';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'maintenance',
   templateUrl: './maintenance.component.html',
   styleUrls: ['./maintenance.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, FormsModule],
   providers: [WebService]
 })
 
@@ -18,6 +19,7 @@ export class MaintenanceComponent implements OnInit {
   filteredRequests: any = [];
   userRole: string = '';
   filterStatus: string = 'all';
+  searchTerm: string = '';
 
   // Pagination properties
   currentPage: number = 1;
@@ -45,13 +47,26 @@ export class MaintenanceComponent implements OnInit {
 
   filterRequests(status: string) {
     this.filterStatus = status;
-    if (status === 'all') {
-      this.filteredRequests = this.maintenanceRequests;
-    } else {
-      const isCompleted = status === 'completed';
-      this.filteredRequests = this.maintenanceRequests.filter((request: any) => request.status === isCompleted);
+    this.applyFilters();
+  }
+
+  searchRequests() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    let requests = this.maintenanceRequests;
+    if (this.filterStatus !== 'all') {
+      const isCompleted = this.filterStatus === 'completed';
+      requests = requests.filter((request: any) => request.status === isCompleted);
     }
-    this.totalItems = this.filteredRequests.length;
+    if (this.searchTerm) {
+      requests = requests.filter((request: any) =>
+        request.property_details.address.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+    this.filteredRequests = requests;
+    this.totalItems = requests.length;
     this.currentPage = 1; // Reset to first page
   }
 

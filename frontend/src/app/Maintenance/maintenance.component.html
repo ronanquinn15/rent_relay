@@ -3,6 +3,9 @@
     <div class="col-sm-12">
       <h2 class="text-center mb-4">Maintenance Requests</h2>
       <div *ngIf="userRole === 'landlord'">
+        <div class="mb-3">
+          <input type="text" class="form-control" placeholder="Search by property address" [(ngModel)]="searchTerm" (input)="searchRequests()">
+        </div>
         <div *ngIf="maintenanceRequests.length > 0; else noRequests">
           <div *ngFor="let request of paginatedRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
             <div class="card-header bg-primary text-white">
