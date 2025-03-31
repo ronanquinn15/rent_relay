@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WebService } from '../Services/web.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-property',
@@ -46,11 +46,14 @@ export class PropertiesComponent implements OnInit {
     this.currentPage = page;
   }
 
-  // Search method
+  // Search and filter method
   searchProperties() {
-    this.filteredProperties = this.properties.filter((prop: any) =>
-      prop.address.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    this.filteredProperties = this.properties.filter((prop: any) => {
+      return (
+        prop.address.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        prop.city.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    });
     this.totalItems = this.filteredProperties.length;
     this.currentPage = 1; // Reset to first page
   }

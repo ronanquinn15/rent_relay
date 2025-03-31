@@ -3,7 +3,7 @@
     <div class="col-sm-12">
       <h2 class="text-center mb-4">Your Properties</h2>
       <div class="mb-3">
-        <input type="text" class="form-control" placeholder="Search by address" [(ngModel)]="searchTerm" (input)="searchProperties()">
+        <input type="text" class="form-control" placeholder="Search by address or city" [(ngModel)]="searchTerm" (input)="searchProperties()">
       </div>
       <div *ngFor="let prop of paginatedProperties; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
         <div class="card-header bg-primary text-white">
