@@ -4,7 +4,7 @@
       <h2 class="text-center mb-4">Maintenance Requests</h2>
       <div *ngIf="userRole === 'landlord'">
         <div *ngIf="maintenanceRequests.length > 0; else noRequests">
-          <div *ngFor="let request of maintenanceRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
+          <div *ngFor="let request of paginatedRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
             <div class="card-header bg-primary text-white">
               <h5 class="mb-0">Request ID: {{ request._id }}</h5>
             </div>
@@ -34,7 +34,7 @@
           <button class="btn btn-outline-primary" (click)="filterRequests('pending')" [class.active]="filterStatus === 'pending'">Pending</button>
         </div>
         <div *ngIf="filteredRequests.length > 0; else noRequests">
-          <div *ngFor="let request of filteredRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
+          <div *ngFor="let request of paginatedRequests; trackBy: trackById" class="card mb-3 custom-hover shadow-sm">
             <div class="card-header bg-primary text-white">
               <h5 class="mb-0">Request ID: {{ request._id }}</h5>
             </div>
@@ -56,6 +56,24 @@
           </div>
         </ng-template>
       </div>
+      <!-- Pagination controls -->
+      <nav *ngIf="totalItems > itemsPerPage" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="changePage(currentPage - 1)" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item" *ngFor="let page of [].constructor(Math.ceil(totalItems / itemsPerPage)); let i = index" [class.active]="currentPage === i + 1">
+            <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === Math.ceil(totalItems / itemsPerPage)">
+            <a class="page-link" (click)="changePage(currentPage + 1)" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </div>
