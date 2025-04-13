@@ -9,12 +9,25 @@ tenants = globals.db.tenants
 landlords = globals.db.landlords
 admin = globals.db.admin
 
+# The point of this file is to handle authentication and authorization for the application.
+# It includes routes for login, logout, and registration of users (tenants and landlords).
+# It also includes validation functions to ensure that the data provided by users is valid and meets certain criteria.
+# The login route checks the provided credentials against the database and returns a JWT token if they are valid.
+# The logout route invalidates the token by adding it to a blacklist.
+# The register route allows new users to create an account by providing their name, username, email, password, and role (tenant or landlord).
+# The register route also checks for unique usernames and emails, and validates the provided data before creating a new user in the database.
+# The JWT token is used for authentication and authorization in the application, allowing users to access protected routes and resources.
+
+
+# This route handles user login and returns a JWT token if the credentials are valid.
 @auth_bp.route('/api/login', methods=['GET'])
 def login():
     auth = request.authorization
     if auth:
+        # The username and password are obtained from the request authorisation header.
         user = tenants.find_one({'username': auth.username}) or landlords.find_one({'username': auth.username}) or admin.find_one({'username': auth.username})
         if user is not None:
+
             if bcrypt.checkpw(bytes(auth.password, 'UTF-8'), user['password']):
                 token = jwt.encode({
                     'user': user['username'],
@@ -29,6 +42,7 @@ def login():
             return make_response(jsonify({'error': 'User not found'}), 404)
     return make_response(jsonify({'error': 'AUTHENTICATION REQUIRED'}), 401)
 
+# This route handles user logout by adding the token to a blacklist.
 @auth_bp.route('/api/logout', methods=['GET'])
 @jwt_required
 def logout():
@@ -36,6 +50,7 @@ def logout():
     blacklist.insert_one({'token': token})
     return make_response(jsonify({'message': 'Logged out successfully'}), 200)
 
+# This route handles user registration for tenants and landlords.
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
     try:

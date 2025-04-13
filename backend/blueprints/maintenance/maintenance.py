@@ -10,6 +10,9 @@ maintenance = globals.db.maintenance
 properties = globals.db.properties
 tenants = globals.db.tenants
 
+# This function is used to auto-populate the tenant_id from the JWT token.
+# It checks if the token is valid and extracts the tenant_id from it.
+# If the token is invalid or expired, it returns None.
 def auto_populate_tenant_id():
     token = request.headers.get('x-access-token')
     if token:
@@ -36,6 +39,8 @@ def auto_populate_landlord_id():
             return None
     return None
 
+# This function is used to validate the required fields in the request.
+# It checks if the required fields are present in the request form data.
 def auto_populate_property_id():
     tenant_id = auto_populate_tenant_id()
     if tenant_id:
@@ -44,9 +49,13 @@ def auto_populate_property_id():
             return tenant['property_id']
     return None
 
+# This function allows tenants to create a maintenance request.
+# It checks if the tenant is authorized and if the required fields are present in the request.
 @maintenance_bp.route('/api/maintenance/submit', methods=['POST'])
 @tenant_required
 def create_maintenance_request():
+    # Define required fields and allowed urgency values
+    # The required fields are 'description' and 'urgency'.
     fields = ['description', 'urgency']
     allowed_urgent_values = ['low', 'medium', 'high']
 
@@ -73,6 +82,9 @@ def create_maintenance_request():
     if error:
         return make_response(jsonify({'error': error}), 400)
 
+    # Create a new maintenance request
+    # The request is created with the property_id, tenant_id, description, urgency, request_date, and status.
+    # The request_date is set to the current date and the status is set to False (not completed).
     new_request = {
         'property_id': property_id,
         'tenant_id': tenant_id,
@@ -87,6 +99,7 @@ def create_maintenance_request():
 @maintenance_bp.route('/api/maintenance', methods=['GET'])
 @landlord_required
 def get_all_maintenance_requests():
+    # Get landlord_id from the JWT token
     landlord_id = auto_populate_landlord_id()
     if not landlord_id:
         return make_response(jsonify({'error': 'Unauthorized'}), 401)
@@ -130,6 +143,8 @@ def get_all_maintenance_requests():
 
     return make_response(jsonify(requests_list), 200)
 
+# This function allows tenants to view all their maintenance requests.
+# It checks if the tenant is authorized and retrieves all requests associated with the tenant_id.
 @maintenance_bp.route('/api/maintenance/submitted', methods=['GET'])
 @tenant_required
 def get_all_requests_based_off_tenant():
@@ -159,6 +174,9 @@ def get_all_requests_based_off_tenant():
         return make_response(jsonify({'error': 'No maintenance requests found for this tenant'}), 404)
     return make_response(jsonify(requests_list), 200)
 
+# This function allows landlords to view the details of a specific maintenance request.
+# It checks if the landlord is authorised and retrieves the request based on the request_id.
+# It also retrieves the tenant and property details associated with the request.
 @maintenance_bp.route('/api/maintenance/details/<request_id>', methods=['GET'])
 @landlord_required
 def get_maintenance_request_with_details(request_id):
@@ -270,6 +288,9 @@ def update_maintenance_request(request_id):
     else:
         return make_response(jsonify({'error': 'Missing fields'}), 400)
 
+# This function allows landlords to delete a maintenance request.
+# It checks if the landlord is authorized and deletes the request based on the request_id.
+# It also checks if the request_id is valid and if the request exists.
 @maintenance_bp.route('/api/maintenance/<request_id>', methods=['DELETE'])
 @tenant_required
 def delete_maintenance_request(request_id):

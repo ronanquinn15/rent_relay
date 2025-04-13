@@ -9,6 +9,15 @@ import { AuthService } from '../Services/authService.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 
+// This component is responsible for displaying the home page
+// It shows the properties owned by the landlord or the tenant's property
+// It also displays charts for property distribution by city and average rent by city
+// The data is fetched from the web service and displayed in a grid format
+// The charts are created using the ag-charts library
+// The component uses Angular's dependency injection to get the web service and authentication service
+// It also uses Angular's router to navigate to different pages
+// The component implements OnInit to perform initialisation tasks
+
 @Component({
   selector: 'home',
   templateUrl: './home.component.html',
@@ -84,6 +93,7 @@ export class HomeComponent implements OnInit {
   initCityRentDistributionChart(): void {
   // Create an object to store both the sum of rent and count of properties by city
   const cityData = this.data.reduce((acc, property) => {
+    // Check if the city already exists in the accumulator
     if (!acc[property.city]) {
       acc[property.city] = {
         totalRent: 0,
@@ -137,6 +147,9 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  // This method is called when the component is initialised
+  // It checks the user's role and loads the relevant information
+  // It also loads the properties for landlords or tenant's property
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.userRole = this.authService.getUserRole();
@@ -163,6 +176,8 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  // The following methods are used to navigate to different pages for editing user information for
+  // each role respectively
   editTenant(): void {
     this.router.navigate(['tenant-details/edit']);
   }

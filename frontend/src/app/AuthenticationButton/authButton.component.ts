@@ -6,6 +6,9 @@ import { AsyncPipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../Services/authService.service';
 
+// This component is responsible for managing the authentication button
+// It handles user login and logout functionality
+
 @Component({
   selector: 'auth-button',
   templateUrl: './authButton.component.html',
@@ -22,14 +25,19 @@ export class AuthButtonComponent {
     this.userRole = this.authService.getUserRole();
   }
 
+  // This method checks if the user is logged in
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
 
+  // This method navigates to the login page
   login() {
     this.router.navigate(['/login']);
   }
 
+  // This method logs out the user
+  // It calls the web service to perform the logout operation
+  // After logging out, it navigates to the login page and emits an event to notify other components
   logout() {
     this.webService.getLogout().subscribe(
       resp => {

@@ -19,9 +19,14 @@ export class UserAuthComponent {
 
   constructor(private webService: WebService) { }
 
+  // Method to handle login
+  // It calls the web service to authenticate the user
   login() {
+    // Check if username and password are provided
     this.webService.getLogin(this.username, this.password).subscribe(
       response => {
+        // If login is successful, store the token and role in session storage
+        // The role is used to determine the user's access level
         console.log('Successfully Logged In', response);
         sessionStorage.setItem('token', response.token);
         sessionStorage.setItem('role', response.role);

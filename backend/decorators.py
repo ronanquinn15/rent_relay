@@ -4,6 +4,11 @@ from functools import wraps
 
 blacklist = globals.db.blacklist
 
+# This module contains decorators for JWT authentication and role-based access control.
+# It uses the JWT library for encoding and decoding JWT tokens.
+# The decorators are used to protect certain routes in the application, ensuring that only authorised
+# users can access them.
+
 def jwt_required(func):
     @wraps(func)
     def jwt_required_wrapper(*args, **kwargs):

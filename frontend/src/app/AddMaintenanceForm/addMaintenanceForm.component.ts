@@ -5,6 +5,9 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+// This component is responsible for adding a maintenance request
+// It uses Angular's Reactive Forms to manage the form state and validation
+
 @Component({
   selector: 'addMaintenanceForm',
   templateUrl: './addMaintenanceForm.component.html',
@@ -26,6 +29,7 @@ export class AddMaintenanceFormComponent {
     });
   }
 
+  // This method is used to set the urgency level of the maintenance request
   setUrgency(value: string) {
     this.maintenanceForm.get('urgency')?.setValue(value);
   }

@@ -11,6 +11,12 @@ from blueprints.tenants.tenants import tenants_bp
 from blueprints.maintenance.maintenance import maintenance_bp
 from bson.objectid import ObjectId
 
+# Initialise Flask app and SocketIO
+# This is the main entry point for the application.
+# It sets up the Flask app, SocketIO, and MongoDB connection.
+# It also registers the blueprints for different functionalities.
+# The app is configured to allow cross-origin requests from the frontend (Angular) application.
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -27,6 +33,7 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client['rentRelayDB']
 messages_collection = db['messages']
 
+# This route gets all messages for a specific property.
 @app.route('/messages/<property_id>', methods=['GET'])
 def get_messages(property_id):
     try:
@@ -43,6 +50,7 @@ def get_messages(property_id):
 
     return make_response(jsonify(messages_list)), 200
 
+# This route handles the sending of messages using SocketIO.
 @socketio.on('message')
 def handle_message(data):
     property_id = data['property_id']
@@ -63,15 +71,19 @@ def handle_message(data):
         'receiver': receiver,
         'msg': msg,
         'timestamp': datetime.utcnow(),
-        'read_receipt': False  # Add the read_receipt field
+        'read_receipt': False  # The read receipt is initially set to False
     }
     db.messages.insert_one(message)
 
     # Emit the message to the receiver
     emit('message', message, room=receiver)
 
+# This handles the read receipt update.
 @socketio.on('update_read_receipt')
 def update_read_receipt(data):
+    # This function updates the read receipt status of a message.
+    # It takes the message ID from the data and updates the database.
+    # After updating, it emits an event to notify the frontend.
     message_id = data['message_id']
     messages_collection.update_one({'_id': ObjectId(message_id)}, {'$set': {'read_receipt': True}})
     socketio.emit('read_receipt_updated', {'message_id': message_id})

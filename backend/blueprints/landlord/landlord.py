@@ -9,6 +9,10 @@ landlord_bp = Blueprint('landlord', __name__)
 landlords = globals.db.landlords
 properties = globals.db.properties
 
+# This function is used to auto-populate the landlord_id from the JWT token.
+# It checks if the token is valid and extracts the landlord_id from it.
+# If the token is invalid or expired, it returns None.
+# This is used in the get_landlord_details route to ensure that the landlord can only access their own details.
 def auto_populate_landlord_id():
     token = request.headers.get('x-access-token')
     if token:
@@ -22,6 +26,7 @@ def auto_populate_landlord_id():
             return None
     return None
 
+# This route handles the retrieving of landlord details.
 @landlord_bp.route('/api/landlords/details', methods=['GET'])
 @landlord_required
 def get_landlord_details():
@@ -45,6 +50,7 @@ def get_all_landlords():
         landlords_list.append(landlord)
     return make_response(jsonify(landlords_list), 200)
 
+# This route handles the updating of a landlords details.
 @landlord_bp.route('/api/landlords/<landlord_id>', methods=['PUT'])
 @landlord_required
 def edit_landlord(landlord_id):
@@ -61,6 +67,7 @@ def edit_landlord(landlord_id):
     fields = ['name', 'username', 'email', 'password']
     updated_information = {}
 
+    # Validate and update the fields
     for field in fields:
         if field in request.form:
             value = request.form[field]
